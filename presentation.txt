@@ -1,0 +1,1 @@
+MyToDoLists simply is a task manager. You can use it for your projects, your daily chores and more!
