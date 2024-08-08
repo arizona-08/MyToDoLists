@@ -33,8 +33,14 @@ function App() {
 		<button className="bg-blue-500 text-white px-3 py-2 rounded-md mb-3 hover:bg-blue-600" onClick={() => addSlot()}>Ajouter un slot +</button>
 		<div className="flex gap-6">
 			{slots.map((slot) => (
-        <Slot key={slot.id} slotId={slot.id} title={slot.title} onTitleEdit={editSlotTitle} onSlotDelete={() => deleteSlot(slot.id)}/>
-      ))}
+				<Slot 
+					key={slot.id} 
+					slotId={slot.id} 
+					title={slot.title} 
+					onTitleEdit={editSlotTitle} 
+					onSlotDelete={() => deleteSlot(slot.id)}
+				/>
+			))}
 		</div>
     </div>
   )

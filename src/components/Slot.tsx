@@ -12,6 +12,7 @@ interface SlotProps{
 interface TaskType{
     id: string;
     content: string;
+    originSlotId: string;
 }
 
 function Slot({slotId, title, onTitleEdit, onSlotDelete}: SlotProps) {
@@ -43,7 +44,7 @@ function Slot({slotId, title, onTitleEdit, onSlotDelete}: SlotProps) {
 
     //permet d'ajouter un objet de type TaqkType au tableau défini juste en haut
     function addTask(){
-        const newTask = {id: uuidv4(), content: "tache à faire"};
+        const newTask = {id: uuidv4(), content: "tache à faire", originSlotId: slotId}; //le slotId est passé dans les props
         setTasks([...tasks, newTask]);
     }
 
@@ -59,9 +60,38 @@ function Slot({slotId, title, onTitleEdit, onSlotDelete}: SlotProps) {
         ));
     }
 
+    /*Cette section sur la fonctionnalité du drag and drop des tâches */
+
+    function handleOnDrag(e: React.DragEvent, task: TaskType){
+        e.dataTransfer.setData("task", JSON.stringify(task));
+    }
+
+    function handleOnDrop(e: React.DragEvent){
+        const droppedTask: TaskType = JSON.parse(e.dataTransfer.getData("task"));
+        
+        if(droppedTask.originSlotId !== slotId){
+            setTasks([...tasks, {...droppedTask, originSlotId: slotId}]);
+
+            // Dispatch an event to delete the task from the original slot
+            const event = new CustomEvent("deleteTask", { detail: { taskId: droppedTask.id, slotId: droppedTask.originSlotId } });
+            window.dispatchEvent(event);
+        }
+        
+    }
+
+    function handleDragOver(e: React.DragEvent){
+        e.preventDefault();
+    }
    
+    // Listen for the custom event to delete the task
+    window.addEventListener("deleteTask", (e: Event) => {
+        const customEvent = e as CustomEvent<{ taskId: string; slotId: string }>; // Type assertion
+        if (customEvent.detail.slotId === slotId) {
+            deleteTask(customEvent.detail.taskId);
+        }
+    });
     return (
-        <div slot-id={slotId} className="w-72 h-fit bg-slate-300 p-3 rounded-md">
+        <div slot-id={slotId} onDrop={handleOnDrop} onDragOver={handleDragOver} className="w-72 h-fit bg-slate-300 p-3 rounded-md">
             <div className="slot-header flex justify-between items-center">
                 <p onClick={handleTitleEdit} className="font-medium text-[20px] mb-2">
                     {
@@ -87,7 +117,7 @@ function Slot({slotId, title, onTitleEdit, onSlotDelete}: SlotProps) {
             
             <div className="task-container">
             {tasks.map((task) => (
-                <Task key={task.id} id={task.id} content={task.content} onDelete={() => deleteTask(task.id)} onEdit={editTask} />
+                <Task key={task.id} id={task.id} content={task.content} onDelete={() => deleteTask(task.id)} onEdit={editTask} handleDrag={(e) => handleOnDrag(e, task)} />
             ))}
             </div>
             <div className="button-container flex justify-center">
