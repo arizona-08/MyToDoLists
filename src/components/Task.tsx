@@ -5,32 +5,41 @@ interface TaskProps{
 	content: string;
 	onDelete: () => void;
 	onEdit: (id: string, newContent: string) => void
+	handleDrag: (e: React.DragEvent, task: {id: string, content: string}) => void
 }
 
-function Task({id, content, onDelete, onEdit}: TaskProps) {
+function Task({id, content, onDelete, onEdit, handleDrag}: TaskProps) {
 	const [isEditing, setIsEditing] = useState<boolean>(true); //autorise par défaut la modification d'une tâche
 	const [newContent, setNewContent] = useState<string>(content);// initialise le contenu d'une tâche
+	const [isDraggable, setIsDraggable] = useState<boolean>(false);
 
 	function handleEdit(){ //gère l'état de l'autorisation pour modifier une tâche
 		setIsEditing(true);
+		setIsDraggable(false)
 	}
 
 	function handleSave(){
 		if(newContent === ""){ //empêche d'avoir une tâche vide
 			onEdit(id, "nouvelle tâche");
 			setIsEditing(false);
+			setIsDraggable(true)
 			return
 		}
 		onEdit(id, newContent);
 		setIsEditing(false);
+		setIsDraggable(true);
 	}
 
 	function handleChange(event: React.ChangeEvent<HTMLInputElement>){
 		setNewContent(event.target.value);
 	}
 
+	function drag(e: React.DragEvent){
+		handleDrag(e, {id, content});
+	}
+
 	return (
-		<div task-id={id} className="w-full bg-white rounded-md h-fit p-2 mb-2 flex justify-between items-start">
+		<div task-id={id} draggable={isDraggable} onDragStart={drag} className="w-full bg-white rounded-md h-fit p-2 mb-2 flex justify-between items-start">
 			{
 				isEditing ? (
 					<input 
