@@ -1,49 +1,39 @@
-import { useState } from "react"
-import { v4 as uuidv4} from "uuid"
-import Slot from "./components/Slot"
+import { useState } from "react";
+import BoardPreview from "./components/BoardPreview";
+import Navbar from "./components/Navbar";
+import CreatePreviewForm from "./components/CreatePreviewForm";
 
-interface SlotType{
-  id: string
-  title: string
+interface BoardPreviewType{
+	boardPreviewName: string
 }
 
 function App() {
-  const [slots, setSlots] = useState<SlotType[]>([])
-  function addSlot(){
-    // const slot: React.ReactNode = <Slot key={slots.length}/>
-    const newSlot = {id: uuidv4(), title: "Nom du slot"}
-    setSlots([...slots, newSlot]);
-  }
+	const[boardPreviews, setBoardPreviews] = useState<BoardPreviewType[]>([]);
 
-  //permet de mettre à jour le composant slot en question
-  function editSlotTitle(slotId: string, newTitle: string){
-    setSlots(
-      slots.map((slot) => 
-        slot.id === slotId ? {...slot, title: newTitle} : slot
-      )
-    )
-  }
+	function handleOnCreate(){
+		console.log("hello");
+		return <CreatePreviewForm createPreview={addBoardPreview}/>
+	}
 
-  function deleteSlot(slotId: string){
-    setSlots(slots.filter(slot => slot.id !== slotId));
-  }
-  return (
-    <div className="mx-5 my-5">
-		<h1 className="text-5xl font-bold mb-6">MA LISTE</h1>
-		<button className="bg-blue-500 text-white px-3 py-2 rounded-md mb-3 hover:bg-blue-600" onClick={() => addSlot()}>Ajouter un slot +</button>
-		<div className="flex gap-6">
-			{slots.map((slot) => (
-				<Slot 
-					key={slot.id} 
-					slotId={slot.id} 
-					title={slot.title} 
-					onTitleEdit={editSlotTitle} 
-					onSlotDelete={() => deleteSlot(slot.id)}
-				/>
-			))}
-		</div>
-    </div>
-  )
+	function addBoardPreview(name: string){
+		const newBoardPreview: BoardPreviewType = {boardPreviewName: name};
+		setBoardPreviews([...boardPreviews, newBoardPreview]);
+	}
+	return (
+		<>
+			<Navbar/>
+			<div className="container p-4">
+				<h2 className="text-3xl font-bold mb-2">Mes ToDoLists</h2>
+				<button onClick={() => handleOnCreate()} className="p-2 bg-blue-500 rounded-md mb-2 text-white">Ajouter une ToDoList</button>
+				<div className="boardsContainer flex flex-wrap gap-2">
+					{boardPreviews.map((preview, index) => (
+						<BoardPreview key={index} boardPreviewName={preview.boardPreviewName}/>
+					))}
+				</div>
+			</div>
+			
+		</>
+	)
 }
 
 export default App

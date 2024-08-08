@@ -124,7 +124,7 @@ function Slot({slotId, title, onTitleEdit, onSlotDelete}: SlotProps) {
                     }
                 </p>
                 <div onClick={onSlotDelete} className="cursor-pointer w-6 h-6">
-                    <img src="close-icon.svg" alt="supprimer" className="w-full"/>
+                    <img src="../close-icon.svg" alt="supprimer" className="w-full"/>
                 </div>
             </div>
             
