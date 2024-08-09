@@ -11,9 +11,8 @@ interface SlotType{
 
 function Board() {
 	const params = useParams<{boardId: string}>(); //récupère les paramètre dans l'url du react browserRouter
-	const boardId = params.boardId;
-	const boardTitle = boardId?.slice(1);
-	// console.log(boardId);
+	const boardTitle = params.boardId;
+	// console.log(boardTitle);
 
 	const [slots, setSlots] = useState<SlotType[]>([])
 	function addSlot(){

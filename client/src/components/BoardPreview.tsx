@@ -6,7 +6,7 @@ interface BoardPreviewProps{
 
 function BoardPreview({ boardPreviewName }: BoardPreviewProps) {
   return (
-    <Link to={`/board/:${boardPreviewName}`} className="font-medium hover:underline">{boardPreviewName}</Link>
+    <Link to={`/board/${boardPreviewName}`} className="font-medium hover:underline">{boardPreviewName}</Link>
   )
 }
 
