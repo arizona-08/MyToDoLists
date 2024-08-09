@@ -47,6 +47,34 @@ export async function getUser(id){
     }
 }
 
+export async function getUserBy(array){
+    const connection = await getConnection();
+    
+    try{
+        let query = "SELECT * FROM users WHERE ";
+        const params = [];
+        for(const obj of array){
+            query += `${obj.type} = ? `;
+            params.push(obj.val);
+        }
+        
+        const users = await connection.query(query, params);
+        if(users.length !== 0){
+            return users[0];
+        } else {
+            return null;
+        }
+        
+    } catch(err){
+        console.error("Something went wrong when fetching data from users: ", err);
+        
+    }finally{
+        if(connection){
+            connection.release();
+        }
+    }
+}
+
 export async function deleteuser(id){
     const connection = await getConnection();
     try{

@@ -1,13 +1,13 @@
 import { useState } from "react";
-import BoardPreview from "./components/BoardPreview";
-import Navbar from "./components/Navbar";
-import CreatePreviewForm from "./components/CreatePreviewForm";
+import BoardPreview from "./BoardPreview";
+import Navbar from "./Navbar";
+import CreatePreviewForm from "./CreatePreviewForm";
 
 interface BoardPreviewType{
 	boardPreviewName: string
 }
 
-function App() {
+function AllLists() {
 	const[boardPreviews, setBoardPreviews] = useState<BoardPreviewType[]>([]);
 	const [showCreatePreviewForm, setShowCreatePreviewForm] = useState<boolean>(false); //permet d'afficher le formulaire de cration d'une liste
 	
@@ -42,4 +42,4 @@ function App() {
 	)
 }
 
-export default App
+export default AllLists
