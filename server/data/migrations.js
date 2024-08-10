@@ -42,7 +42,8 @@ async function create_users_table(){
             name VARCHAR(255),
             firstname VARCHAR(255),
             email VARCHAR(320),
-            password CHAR(60)
+            password CHAR(60),
+            auth_token VARCHAR(32)
         )`;
         await connection.query(query);
     } catch (err){

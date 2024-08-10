@@ -46,11 +46,12 @@ app.get("/api/user/:id", async (request, response) => {
     response.send(user);
 });
 
+//transformer route pour avoir vrai paramètre dynamique du type user?type=email&val=something
 app.get("/api/user/:type/:val", async (request, response) => {
     const type = request.params.type;
     const val = request.params.val;
-    const user = await USER.getUserBy([
-        {type: type, val: val}
+    const user = await USER.getUser([
+        {[type] : val}
     ]);
     response.send(user);
 })
@@ -63,14 +64,14 @@ app.post("/api/create-user", async (request, response) => {
 
 app.delete("/api/delete-user/:id", async (request, response) => {
     const userId = request.params.id;
-    await USER.deleteuser(userId);
+    await USER.deleteUser({id: id});
     response.status(201).send();
 });
 
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
-    const user = await USER.getUserBy([
-        {type: "email", val: email}
+    const user = await USER.getUser([
+        {email: email}
     ]);
 
     
