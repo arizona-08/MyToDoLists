@@ -1,7 +1,26 @@
 import express from "express";
 import cors from "cors";
+import dotenv from "dotenv";
 import * as USER from "./data/user.js";
 import { comparePasswords } from "./data/utils.js";
+import { runMigration } from "./data/migrations.js";
+import { access, writeFile } from "fs/promises";
+
+
+dotenv.config();
+const api_key = process.env.API_KEY;
+
+try {
+    await access("migrated.txt");
+} catch (err){
+    await runMigration(api_key);
+    try{
+        await writeFile("migrated.txt", "ran migration")
+    } catch (err){
+        console.error("something went wrong when writing to file migrated.txt: ", err);
+    }
+}
+
 
 const app = express();
 app.use((err, req, res, next) => {
