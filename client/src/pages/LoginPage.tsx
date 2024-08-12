@@ -19,7 +19,7 @@ function LoginPage() {
         try {
             const result = await axios.post('http://localhost:3000/api/login', { email, password });
             if (result.data.success) {
-                return result.data.id;
+                return result.data.token;
             } else {
                 return false;
             }
@@ -31,14 +31,13 @@ function LoginPage() {
     async function handleConfirm(e: React.MouseEvent){
         e.preventDefault();
         setErrors({});
-        
         // console.log(user);
-        const isLoggedIn = await login(email, password);
+        const loggin_token = await login(email, password);
 
-        if(!isLoggedIn){
+        if(!loggin_token){
             setErrors({...formErrors, wrongCredentials: "Identifiants invalid"});
         } else {
-            navigate(`/my-lists/${isLoggedIn}`);
+            navigate(`/my-lists/${loggin_token}`);
         }
     
 

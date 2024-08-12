@@ -5,6 +5,7 @@ import * as USER from "./data/user.js";
 import { comparePasswords } from "./data/utils.js";
 import { runMigration } from "./data/migrations.js";
 import { access, writeFile } from "fs/promises";
+import * as BOARDS from "./data/board.js";
 
 
 dotenv.config();
@@ -42,38 +43,37 @@ app.get("/api/users", async (request, response) => {
 
 app.get("/api/user/:id", async (request, response) => {
     const id = request.params.id;
-    const user = await USER.getUser(id);
+    const user = await USER.getUser({id: id});
     response.send(user);
 });
 
-//transformer route pour avoir vrai paramètre dynamique du type user?type=email&val=something
-app.get("/api/user/:type/:val", async (request, response) => {
-    const type = request.params.type;
-    const val = request.params.val;
-    const user = await USER.getUser([
-        {[type] : val}
-    ]);
-    response.send(user);
-})
 
 app.post("/api/create-user", async (request, response) => {
     const {name, firstname, email, password} = request.body;
-    await USER.createUser(name, firstname, email, password);
-    response.status(201).send();
+    const existingusers = await USER.getUsersBy({email: email});
+    if(existingusers){
+        response.status(400).json({
+            success: false,
+            message: "Email déja associé à un compte."
+        })
+    } else {
+        await USER.createUser(name, firstname, email, password);
+        response.status(201).send();
+    }
+    
 });
 
 app.delete("/api/delete-user/:id", async (request, response) => {
     const userId = request.params.id;
-    await USER.deleteUser({id: id});
+    await USER.deleteUser([["id", "=", userId]]);
     response.status(201).send();
 });
 
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
-    const user = await USER.getUser([
-        {email: email}
-    ]);
+    const user = await USER.getUser({email: email});
 
+    // res.send(user);
     
     if (user === null) {
         return res.status(404).json({ success: false, message: 'User not found' });
@@ -82,10 +82,39 @@ app.post('/api/login', async (req, res) => {
     const isMatching = await comparePasswords(password, user.password);
 
     if (isMatching) {
-        return res.status(200).json({ success: true, message: 'Login successful', id: user.id });
+        await USER.updateUser({is_logged: true}, {email: email});
+        return res.status(200).json({ success: true, message: 'Login successful', token: user.auth_token });
     } else {
         return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 });
 
-app.listen(3000, () => console.log("app is running on http://localhost:3000"))
+app.patch('/api/logout', async (req, res) => {
+    const {auth_token} = req.body;
+    await USER.updateUser({is_logged: false}, {auth_token: auth_token});
+    res.send("logged out");
+})
+
+app.get('/api/get-boards', async (req, res) => {
+    const auth_token = req.query.auth_token;
+    const user = await USER.getUser({auth_token: auth_token});
+    if(user !== null){
+        const boards = await BOARDS.getBoards({user_id: user.id});
+        if(boards !== null){
+            res.status(201).json({success: true, boards: boards, user: {
+                id: user.id,
+                auth_token: user.auth_token
+            }});
+        }
+    } else {
+        res.json({success: false, message: "wrong URL"})
+    }
+});
+
+app.post('/api/create-board', async (req, res) => {
+    const {board_name, user_id} = req.body;
+    await BOARDS.createBoard(board_name, user_id);
+    res.status(201).json({success: true});
+})
+
+app.listen(3000, () => console.log("app is running on http://localhost:3000"));

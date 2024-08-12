@@ -43,7 +43,8 @@ async function create_users_table(){
             firstname VARCHAR(255),
             email VARCHAR(320),
             password CHAR(60),
-            auth_token VARCHAR(32)
+            auth_token VARCHAR(32),
+            is_logged BOOL DEFAULT false
         )`;
         await connection.query(query);
     } catch (err){

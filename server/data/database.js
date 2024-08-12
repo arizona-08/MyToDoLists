@@ -28,7 +28,7 @@ async function close(connection){
 /**
  * 
  * @param {string} table 
- * @param {Array} valuesObj
+ * @param {object} valuesObj
  * 
  * 
  */
@@ -83,6 +83,30 @@ export async function get(table, whereObj = null){
     }
 }
 
+export async function getWhere(table, whereArr){
+    //example whereArr = [["id", ">", 3], ["role", "=", 1]]
+
+    const connection = await getConnection();
+
+    try{
+        const bindParams = [];
+        let query = `SELECT * FROM ${table} WHERE `;
+
+        whereArr.forEach(whereClause => {
+            query += `${whereClause[0]} ${whereClause[1]} ? AND `
+            bindParams.push(whereClause[2]);
+        });
+
+        query = query.slice(0, -5); // retirer le AND en trop
+        const results = await connection.query(query, bindParams);
+        return results;
+    }catch(err){
+        console.error(`Something went wrong when fetching data in ${table} table. func: getWhere() :`, err);
+    }finally{
+        close(connection);
+    }
+}
+
 export async function getOneBy(table, whereObj = null){
     const result = await get(table, whereObj);
     return result[0];
@@ -99,8 +123,9 @@ export async function update(table, setObj, whereObj){
             query += `${key} = ?, `;
         }
 
+        query = query.slice(0, -2); //retire l'espace et la virgule
 
-        query += "WHERE ";
+        query += " WHERE ";
         for(const key in whereObj){
             params.push(whereObj[key]);
             query += `${key} = ? AND `;
@@ -114,15 +139,35 @@ export async function update(table, setObj, whereObj){
     }
 }
 
-export async function deleteData(table, whereObj){
+// export async function deleteData(table, whereObj){
+//     const connection = await getConnection();
+//     try{
+//         const params = [];
+//         let query = `DELETE FROM ${table} WHERE `;
+//         for(const key in whereObj){
+//             params.push(whereObj[key]);
+//             query += `${key} = ? AND `;
+//         }
+//         query = query.slice(0, -5);
+//         return await connection.query(query, params);
+        
+//     }catch (err){
+//         console.error(`Something went wrong when deleting data from ${table} table`, err);
+//     } finally{
+//         close(connection);
+//     }
+// }
+
+export async function deleteData(table, whereArr){
     const connection = await getConnection();
     try{
         const params = [];
         let query = `DELETE FROM ${table} WHERE `;
-        for(const key in whereObj){
-            params.push(whereObj[key]);
-            query += `${key} = ? AND `;
-        }
+
+        whereArr.forEach(whereClause => {
+            params.push(whereClause[2]); // ajoute le paramètre dans le tableau de paramètre
+            query += `${whereClause[0]} ${whereClause[1]} ? AND `;
+        })
         query = query.slice(0, -5);
         return await connection.query(query, params);
         
