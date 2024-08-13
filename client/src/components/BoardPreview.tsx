@@ -1,12 +1,14 @@
 import { Link } from "react-router-dom"
 
 interface BoardPreviewProps{
-    boardPreviewName: string
+    boardPreviewName: string,
+    auth_token: string | undefined,
+    board_id: string | number
 }
 
-function BoardPreview({ boardPreviewName }: BoardPreviewProps) {
+function BoardPreview({ boardPreviewName, auth_token, board_id }: BoardPreviewProps) {
   return (
-    <Link to={`/board/${boardPreviewName}`} className="font-medium hover:underline">{boardPreviewName}</Link>
+    <Link to={`/board/${auth_token}/${board_id}`} className="font-medium hover:underline">{boardPreviewName}</Link>
   )
 }
 

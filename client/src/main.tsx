@@ -31,7 +31,7 @@ const router = createBrowserRouter([
     errorElement: <NotFoundPage/>
   },
   {
-    path: "/board/:boardId",
+    path: "/board/:auth_token/:board_id",
     element: <Board/>,
     errorElement: <NotFoundPage/>
   },

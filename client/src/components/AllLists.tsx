@@ -94,7 +94,7 @@ function AllLists() {
 					<button onClick={() => setShowCreatePreviewForm(true)} className="p-2 bg-blue-500 rounded-md mb-2 text-white">Ajouter une ToDoList</button>
 					<div className="boardsContainer flex flex-wrap gap-2">
 						{boards.map((preview, index) => (
-							<BoardPreview key={index} boardPreviewName={preview.board_name}/>
+							<BoardPreview key={index} boardPreviewName={preview.board_name} auth_token={user_token} board_id={preview.id}/>
 						))}
 					</div>
 				</div>

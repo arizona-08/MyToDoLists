@@ -57,10 +57,10 @@ function Task({id, content, onDelete, onEdit, handleDrag}: TaskProps) {
 			
 			<div className="actions flex gap-1">
 				<div onClick={handleEdit} className="modify bg-blue-500 hover:bg-blue-600 w-6 h-6 p-1 rounded-md">
-					<img className="w-full" src="../pen.png" alt="modifier" />
+					<img className="w-full" src="../../pen.png" alt="modifier" />
 				</div>
 				<div onClick={onDelete} className="delete bg-red-500 hover:bg-red-600 w-6 h-6 p-1 rounded-md">
-					<img className="w-full" src="../trash.png" alt="supprimer" />
+					<img className="w-full" src="../../trash.png" alt="supprimer" />
 				</div>
 			</div>
 		</div>
