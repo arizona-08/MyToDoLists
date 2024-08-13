@@ -177,3 +177,44 @@ export async function deleteData(table, whereArr){
         close(connection);
     }
 }
+
+export async function getWithJoin(column_alias, base_table, joined_table, matching_keys, whereClause = null){
+    const connection = await getConnection();
+    try{
+        let query = `SELECT `;
+        column_alias.forEach(column => {
+            query += `${column[0]} as ${column[1]}, `
+        });
+        query = query.slice(0, -2); // remove the comma
+
+        query+= ` FROM ${base_table} INNER JOIN ${joined_table} ON `;
+
+        matching_keys.forEach(keys => {
+            query+= `${keys[0]} = ${keys[1]}, `;
+        });
+        query = query.slice(0, -2); // remove the comma
+
+        if(whereClause !== null){
+            const params = [];
+            query+= ` WHERE `;
+            whereClause.forEach(clause => {
+                query += `${clause[0]} = ? AND `;
+                params.push(clause[1]);
+            });
+
+            query = query.slice(0, -5); // remove the AND
+            // console.log(query);
+            const results = await connection.query(query, params);
+            return results;
+        }
+
+        const results = await connection.query(query);
+        return results;
+    } catch (err) {
+        console.error(`Error when retrieving data from join ${base_table} ${joined_table}: `, err);
+    } finally{
+        close(connection);
+    }
+    
+
+}
