@@ -63,7 +63,7 @@ function Board() {
 
 		getBoard();
 
-	}, []);
+	}, [url_auth_token, url_board_id]);
 
 	if(board){
 		return (

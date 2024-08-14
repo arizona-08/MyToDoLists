@@ -8,6 +8,7 @@ import Board from './components/Board.tsx'
 import RegisterPage from './pages/RegisterPage.tsx'
 import LoginPage from './pages/LoginPage.tsx'
 import Welcome from './pages/Welcome.tsx'
+import AuthProvider from './Context/AuthProvider.tsx'
 
 const router = createBrowserRouter([
   {
@@ -28,17 +29,20 @@ const router = createBrowserRouter([
   {
     path: "/my-lists/:user",
     element: <AllLists/>,
-    errorElement: <NotFoundPage/>
+    // errorElement: <NotFoundPage/>
   },
   {
     path: "/board/:auth_token/:board_id",
     element: <Board/>,
-    errorElement: <NotFoundPage/>
+    // errorElement: <NotFoundPage/>
   },
   
 ])
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <RouterProvider router={router}/>
+    <AuthProvider>
+      <RouterProvider router={router}/>
+    </AuthProvider>
+    
   </React.StrictMode>,
 )

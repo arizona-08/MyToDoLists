@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import BoardPreview from "./BoardPreview";
 import Navbar from "./Navbar";
 import CreatePreviewForm from "./CreatePreviewForm";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import NotFoundPage from "../pages/NotFoundPage";
+import { useAuthContext } from "../Context/useAuthContext";
 
 interface Board{
 	id: number,
@@ -28,6 +29,8 @@ function AllLists() {
 	const [boards, setBoards] = useState<Board[]>([]);
 	const urlParams = useParams();
 	const user_token = urlParams.user;
+	const {is_logged, auth_token} = useAuthContext();
+	const navigate = useNavigate();
 
 	//ajoute une preview au tableau de preview
 	async function addBoardPreview(board_name: string){
@@ -36,7 +39,7 @@ function AllLists() {
 
 		const request = await axios.get("http://localhost:3000/api/get-boards", {
 			params: {
-				auth_token: user_token
+				auth_token: auth_token
 			}
 		});
 
@@ -51,6 +54,10 @@ function AllLists() {
 	}
 
 	useEffect(() => {
+
+		if(!is_logged){
+			navigate("/");
+		}
 
 		async function getBoards(){
 			const request = await axios.get("http://localhost:3000/api/get-boards", {
@@ -102,6 +109,7 @@ function AllLists() {
 		)
 	} else {
 		return <NotFoundPage/>
+
 	}
 }
 

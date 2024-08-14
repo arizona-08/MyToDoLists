@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useAuthContext } from "../Context/useAuthContext";
 
 interface FormErrors {
     [key: string]: string | undefined;
 }
 
 function LoginPage() {
+    const { is_logged, auth_token, setAuthInfo } = useAuthContext();
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [formErrors, setErrors] = useState<FormErrors>({})
@@ -19,7 +21,10 @@ function LoginPage() {
         try {
             const result = await axios.post('http://localhost:3000/api/login', { email, password });
             if (result.data.success) {
-                return result.data.token;
+                const auth_token = result.data.token
+                sessionStorage.setItem("log_info", JSON.stringify({auth_token: auth_token, is_logged: true}));
+                setAuthInfo(auth_token, true);
+                return auth_token;
             } else {
                 return false;
             }
@@ -43,11 +48,11 @@ function LoginPage() {
 
     }
 
-    // useEffect(() => {
-    //     if(formErrors.userNotFound){
-    //         console.log(formErrors.userNotFound)
-    //     }
-    // }, [formErrors]);
+    useEffect(() => {
+        if(is_logged){
+            navigate(`/my-lists/${auth_token}`)
+        }
+    }, []);
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement>, func: (value: string)=> void){
         func(e.target.value);

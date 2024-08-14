@@ -91,9 +91,15 @@ app.post('/api/login', async (req, res) => {
 
 //créer un petit bouton qui envoie le auth_token en paramètre url, le récupérer et modfifier la colonne is_logged a false
 app.patch('/api/logout', async (req, res) => {
-    const {auth_token} = req.body;
-    await USER.updateUser({is_logged: false}, {auth_token: auth_token});
-    res.send("logged out");
+    const auth_token = req.body.auth_token;
+    const user = await USER.getUser({auth_token: auth_token});
+    if(user !== null){
+        await USER.updateUser({is_logged: false}, {auth_token: auth_token});
+        return res.json({success: true, message: "Successfully logged out", requested: req.body});
+    } else {
+        return res.json({success: false, message: "Utilisateur introuvable", requested: auth_token});
+    }
+    
 })
 
 app.get('/api/get-boards', async (req, res) => {
