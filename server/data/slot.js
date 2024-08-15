@@ -1,4 +1,4 @@
-import { deleteData, get, getOneBy, insert } from "./database.js";
+import { deleteData, get, getOneBy, insert, update } from "./database.js";
 
 export async function createSlot(uuid, title, board_id){
     return await insert("slots", {char_id: uuid, title: title, board_id: board_id})
@@ -18,6 +18,10 @@ export async function getSlots(board_id){
         return results;
     }
     return null;
+}
+
+export async function updateSlot(setObj, whereObj){
+    return await update("slots", setObj, whereObj);
 }
 
 export async function deleteSlot(char_id){

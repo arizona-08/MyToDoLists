@@ -164,6 +164,16 @@ app.post("/api/create-slot", async (req, res) => {
     }
 });
 
+app.get("/api/get-slot", async (req, res) => {
+    const {char_id} = req.query;
+    const slot = await SLOT.getSlot({char_id: char_id});
+    if(slot){
+        return res.status(200).json({success: true, slot: slot});
+    } else {
+        return res.json({success: false, message: "slot not found"});
+    }
+});
+
 app.get("/api/get-slots", async (req, res) => {
     const {board_id} = req.query;
     const slots = await SLOT.getSlots(board_id);
@@ -171,6 +181,18 @@ app.get("/api/get-slots", async (req, res) => {
         return res.status(200).json({success: true, slots: slots});
     } else {
         return res.json({success: false, message: `board with board_id ${board_id} not found.`})
+    }
+});
+
+app.patch("/api/update-slot-name", async (req, res) => {
+    const {char_id, title} = req.body.data;
+    const existing_slot = await SLOT.getSlot({char_id: char_id});
+
+    if(existing_slot){
+        await SLOT.updateSlot({title: title}, {char_id: char_id});
+        return res.status(200).json({success: true, message: "slot name successfully changed"});
+    } else {
+        return res.json({success: false, message: "slot not found"});
     }
 });
 

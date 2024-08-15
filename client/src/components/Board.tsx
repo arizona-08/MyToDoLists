@@ -9,6 +9,7 @@ import NotFoundPage from "../pages/NotFoundPage"
 interface SlotType{
 	char_id: string;
 	title: string;
+	is_firstEditing: boolean
 }
 
 interface BoardParams{
@@ -25,7 +26,7 @@ function Board() {
 	const [slots, setSlots] = useState<SlotType[]>([]);
 
 	async function addSlot(){
-		const newSlot = {char_id: uuidv4(), title: "Nom du slot"}
+		const newSlot = {char_id: uuidv4(), title: "Nom du slot", is_firstEditing: true}
 		const response = await axios.post("http://localhost:3000/api/create-slot", {
 			uuid: newSlot.char_id,
 			title: newSlot.title,
@@ -97,7 +98,7 @@ function Board() {
 						fetchedSlots.forEach((slot: SlotType) => {
 							// Ensure no duplicates are added
 							if (!updatedSlots.some((s) => s.char_id === slot.char_id)) {
-								updatedSlots.push(slot);
+								updatedSlots.push({...slot, is_firstEditing: false});
 							}
 						});
 						return updatedSlots;
@@ -125,7 +126,8 @@ function Board() {
 							<Slot 
 								key={slot.char_id} 
 								slotId={slot.char_id} 
-								title={slot.title} 
+								title={slot.title}
+								is_firstEditing={slot.is_firstEditing}
 								onTitleEdit={editSlotTitle} 
 								onSlotDelete={async () => await deleteSlot(slot.char_id)}
 							/>

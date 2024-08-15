@@ -1,10 +1,12 @@
 import { useState } from "react";
 import {v4 as uuidv4} from "uuid";
 import Task from "./Task";
+import axios from "axios";
 
 interface SlotProps{
     slotId: string
     title: string
+    is_firstEditing: boolean
     onTitleEdit: (slotId: string, newTitle: string) => void;
     onSlotDelete: () => void;
 }
@@ -15,8 +17,8 @@ interface TaskType{
     originSlotId: string;
 }
 
-function Slot({slotId, title, onTitleEdit, onSlotDelete}: SlotProps) {
-    const [isEditing, setIsEditing] = useState<boolean>(false); //gère l'état de la modification du tire
+function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotProps) {
+    const [isEditing, setIsEditing] = useState<boolean>(is_firstEditing); //gère l'état de la modification du tire
     const [newTitle, setNewTitle] = useState<string>(title); //gère le nouveau titre
     const [tasks, setTasks] = useState<TaskType[]>([]); //crée un tableu d'obket de type TaskType
     const [draggedTask, setDraggedTask] = useState<TaskType | null>(null);
@@ -27,14 +29,36 @@ function Slot({slotId, title, onTitleEdit, onSlotDelete}: SlotProps) {
     }
 
     //sauvegarde la modification du titre
-    function handleSave(){
-        if(newTitle === ""){ //empêche d'avoir un nom de slot vide
-            onTitleEdit(slotId, "Nom du slot");
-            setIsEditing(false);
-            return
+    async function handleSave(){
+        const response = await axios.get("http://localhost:3000/api/get-slot", {
+            params: {
+                char_id: slotId
+            }
+        });
+
+        if(response.data.success){
+            const oldTitle = response.data.slot.title;
+            if(newTitle === ""){ //empêche d'avoir un nom de slot vide
+                onTitleEdit(slotId, oldTitle);
+                setIsEditing(false);
+                return
+            } else {
+                const changeResponse = await axios.patch("http://localhost:3000/api/update-slot-name", {
+                    data: {
+                        char_id: slotId,
+                        title: newTitle
+                    }
+                });
+
+                if(changeResponse.data.success){
+                    onTitleEdit(slotId, newTitle);
+                    setIsEditing(false);
+                }
+                
+            }
+        } else {
+            console.error("something went horribly wrong!!");
         }
-        onTitleEdit(slotId, newTitle);
-        setIsEditing(false);
     }
 
     //permet de modifier le titre
@@ -114,7 +138,7 @@ function Slot({slotId, title, onTitleEdit, onSlotDelete}: SlotProps) {
                             type="text"
                             value={newTitle}
                             onChange={handleChange}
-                            onBlur={handleSave}
+                            onBlur={async () => await handleSave()}
                             autoFocus
                             className="w-full px-1 border border-gray-300 rounded-md"
                         />
