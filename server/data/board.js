@@ -21,6 +21,10 @@ export async function getBoardWithJoin(column_alias_array, joined_table, on_keys
     return null;
 }
 
+export async function getSingleBoard(whereObj){
+    const result = await getOneBy("boards", whereObj);
+    return result;
+}
 
 // [ // column as alias
 //     ["users.id", "u_id"], 

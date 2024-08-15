@@ -16,7 +16,7 @@ interface TaskType{
 }
 
 function Slot({slotId, title, onTitleEdit, onSlotDelete}: SlotProps) {
-    const [isEditing, setIsEditing] = useState<boolean>(true); //gère l'état de la modification du tire
+    const [isEditing, setIsEditing] = useState<boolean>(false); //gère l'état de la modification du tire
     const [newTitle, setNewTitle] = useState<string>(title); //gère le nouveau titre
     const [tasks, setTasks] = useState<TaskType[]>([]); //crée un tableu d'obket de type TaskType
     const [draggedTask, setDraggedTask] = useState<TaskType | null>(null);

@@ -83,8 +83,9 @@ async function create_slots_table(){
     try{
         const query = `
         CREATE TABLE IF NOT EXISTS slots(
-            id UUID PRIMARY KEY,
-            slot_name VARCHAR(20),
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            char_id UUID UNIQUE,
+            title VARCHAR(20),
             board_id INT,
             FOREIGN KEY (board_id) REFERENCES boards(id)
         )`;
@@ -104,11 +105,12 @@ async function create_tasks_table(){
     try{
         const query = `
         CREATE TABLE IF NOT EXISTS tasks(
-            id UUID PRIMARY KEY,
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            task_id UUID UNIQUE,
             content VARCHAR(20),
             positionIndex INT,
             slot_id UUID,
-            FOREIGN KEY (slot_id) REFERENCES slots(id)
+            FOREIGN KEY (slot_id) REFERENCES slots(char_id)
         )`;
         await connection.query(query);
     } catch (err){

@@ -1,11 +1,12 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import * as USER from "./data/user.js";
 import { comparePasswords } from "./data/utils.js";
 import { runMigration } from "./data/migrations.js";
 import { access, writeFile } from "fs/promises";
-import * as BOARDS from "./data/board.js";
+import * as USER from "./data/user.js";
+import * as BOARD from "./data/board.js";
+import * as SLOT from "./data/slot.js";
 
 
 dotenv.config();
@@ -32,9 +33,7 @@ app.use((err, req, res, next) => {
 app.use(cors());
 app.use(express.json());
 
-app.get("/api/tasks", (request, response) => {
-    response.send("hello worlds");
-});
+//------ USER RELATED ROUTES -------
 
 app.get("/api/users", async (request, response) => {
     const users = await USER.getUsers();
@@ -89,7 +88,7 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-//créer un petit bouton qui envoie le auth_token en paramètre url, le récupérer et modfifier la colonne is_logged a false
+
 app.patch('/api/logout', async (req, res) => {
     const auth_token = req.body.auth_token;
     const user = await USER.getUser({auth_token: auth_token});
@@ -102,11 +101,12 @@ app.patch('/api/logout', async (req, res) => {
     
 })
 
+// -------- BOARD RELATED ROUTES --------
 app.get('/api/get-boards', async (req, res) => {
     const auth_token = req.query.auth_token;
     const user = await USER.getUser({auth_token: auth_token});
     if(user !== null){
-        const boards = await BOARDS.getBoards({user_id: user.id});
+        const boards = await BOARD.getBoards({user_id: user.id});
         if(boards !== null){
             res.status(201).json({success: true, boards: boards, user: {
                 id: user.id,
@@ -120,14 +120,14 @@ app.get('/api/get-boards', async (req, res) => {
 
 app.post('/api/create-board', async (req, res) => {
     const {board_name, user_id} = req.body;
-    await BOARDS.createBoard(board_name, user_id);
+    await BOARD.createBoard(board_name, user_id);
     res.status(201).json({success: true});
 })
 
 app.get('/api/get-board', async (req, res) => {
     const auth_token = req.query.auth_token;
     const board_id = req.query.board_id;
-    const boards = await BOARDS.getBoardWithJoin(
+    const boards = await BOARD.getBoardWithJoin(
         [
             ["users.id", "u_id"], 
             ["boards.id", "b_id"], 
@@ -148,6 +148,51 @@ app.get('/api/get-board', async (req, res) => {
     } else {
         return res.json({success: false, message: "wrong URL", requested: req.query});
     }
+});
+
+// -------- SLOT RELATED ROUTES --------
+
+app.post("/api/create-slot", async (req, res) => {
+    const {uuid, title, board_id} = req.body;
+    const existing_board = await BOARD.getSingleBoard({id: board_id});
+
+    if(existing_board){
+        await SLOT.createSlot(uuid, title, board_id);
+        res.status(201).json({success: true, message: `Successfully created slot ${uuid}`});
+    } else {
+        res.json({success: false, message: `Board ${board_id} not found`});
+    }
+});
+
+app.get("/api/get-slots", async (req, res) => {
+    const {board_id} = req.query;
+    const slots = await SLOT.getSlots(board_id);
+    if(slots){
+        return res.status(200).json({success: true, slots: slots});
+    } else {
+        return res.json({success: false, message: `board with board_id ${board_id} not found.`})
+    }
+});
+
+app.delete("/api/delete-slot", async(req, res) => {
+    const {char_id} = req.body;
+    const existing_slot = await SLOT.getSlot({char_id: char_id});
+    if(existing_slot){
+        try{
+            await SLOT.deleteSlot(char_id);
+            return res.status(200).json({success: true, message: "slot deleted successfully"})
+        } catch (err) {
+            return res.json({success: false, message: err});
+        }
+        
+    }
 })
+
+// -------- TASKS RELATED ROUTES --------
+
+app.get("/api/tasks", (request, response) => {
+    response.send("hello worlds");
+});
+
 
 app.listen(3000, () => console.log("app is running on http://localhost:3000"));

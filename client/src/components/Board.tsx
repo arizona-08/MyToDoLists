@@ -7,8 +7,8 @@ import axios from "axios"
 import NotFoundPage from "../pages/NotFoundPage"
 
 interface SlotType{
-  id: string
-  title: string
+	char_id: string;
+	title: string;
 }
 
 interface BoardParams{
@@ -22,24 +22,45 @@ function Board() {
 	const url_board_id = urlParams.board_id;
 	const [board, setBoard] = useState<BoardParams>();
 
-	const [slots, setSlots] = useState<SlotType[]>([])
-	function addSlot(){
-		// const slot: React.ReactNode = <Slot key={slots.length}/>
-		const newSlot = {id: uuidv4(), title: "Nom du slot"}
-		setSlots([...slots, newSlot]);
+	const [slots, setSlots] = useState<SlotType[]>([]);
+
+	async function addSlot(){
+		const newSlot = {char_id: uuidv4(), title: "Nom du slot"}
+		const response = await axios.post("http://localhost:3000/api/create-slot", {
+			uuid: newSlot.char_id,
+			title: newSlot.title,
+			board_id: url_board_id
+		});
+
+		if(response.data.success){
+			setSlots([...slots, newSlot]);
+		} else {
+			throw new Error("something wrong happened when creating new slot");
+		}
+		
 	}
 
 	//permet de mettre à jour le composant slot en question
 	function editSlotTitle(slotId: string, newTitle: string){
 		setSlots(
 			slots.map((slot) => 
-			slot.id === slotId ? {...slot, title: newTitle} : slot
+			slot.char_id === slotId ? {...slot, title: newTitle} : slot
 			)
 		)
 	}
 
-	function deleteSlot(slotId: string){
-		setSlots(slots.filter(slot => slot.id !== slotId));
+	async function deleteSlot(slotId: string){
+		const response = await axios.delete("http://localhost:3000/api/delete-slot", {
+			data: {
+				char_id: slotId
+			}
+		});
+		if(response.data.success){
+			setSlots(slots.filter(slot => slot.char_id !== slotId));
+		} else{
+			console.error("error when deleting slot");
+		}
+		
 	}
 
 	useEffect(() => {
@@ -61,7 +82,34 @@ function Board() {
 			
 		}
 
+		async function getSlots(){
+			try{
+				const response = await axios.get("http://localhost:3000/api/get-slots", {
+					params: {
+						board_id: url_board_id
+					}
+				});
+
+				if(response.data.success){
+					const fetchedSlots = response.data.slots;
+					setSlots((prevSlots) => {
+						const updatedSlots = [...prevSlots];
+						fetchedSlots.forEach((slot: SlotType) => {
+							// Ensure no duplicates are added
+							if (!updatedSlots.some((s) => s.char_id === slot.char_id)) {
+								updatedSlots.push(slot);
+							}
+						});
+						return updatedSlots;
+					})
+				}
+			} catch (err){
+				console.error("Something wrong happened when fetching slots", err);
+			}
+		}
+
 		getBoard();
+		getSlots();
 
 	}, [url_auth_token, url_board_id]);
 
@@ -71,15 +119,15 @@ function Board() {
 				<Navbar/>
 				<div className="mx-5 my-5">
 					<h1 className="text-5xl font-thin mb-6">{board?.board_name}</h1>
-					<button className="bg-blue-500 text-white px-3 py-2 rounded-md mb-3 hover:bg-blue-600" onClick={() => addSlot()}>Ajouter un slot +</button>
+					<button className="bg-blue-500 text-white px-3 py-2 rounded-md mb-3 hover:bg-blue-600" onClick={async () => await addSlot()}>Ajouter un slot +</button>
 					<div className="flex gap-6">
 						{slots.map((slot) => (
 							<Slot 
-								key={slot.id} 
-								slotId={slot.id} 
+								key={slot.char_id} 
+								slotId={slot.char_id} 
 								title={slot.title} 
 								onTitleEdit={editSlotTitle} 
-								onSlotDelete={() => deleteSlot(slot.id)}
+								onSlotDelete={async () => await deleteSlot(slot.char_id)}
 							/>
 						))}
 					</div>
