@@ -27,7 +27,11 @@ function Navbar() {
 
 			{is_logged && 
 				<div>
-					<span onClick={async () => await handleLogout()} className="underline cursor-pointer">Se Déconnecter</span>
+					<ul className="flex items-center gap-7">
+						<li className="underline"><Link to={`/my-lists/${auth_token}`}>Mes listes</Link></li>
+						<li><span onClick={async () => await handleLogout()} className="underline cursor-pointer">Se Déconnecter</span></li>
+					</ul>
+					
 				</div>
 			}
 		</div>

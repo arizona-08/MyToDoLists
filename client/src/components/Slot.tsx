@@ -93,10 +93,11 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
     }
 
     //permet de supprimer une tâche grâce à son id
-    async function deleteTask(taskId: string){
+    async function deleteTask(taskId: string, slot_id: string){
         const response = await axios.delete("http://localhost:3000/api/delete-task", {
             data: {
-                task_id: taskId
+                task_id: taskId,
+                slot_id: slot_id
             }
         });
         if(response.data.success){
@@ -162,17 +163,31 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
         }
     }
 
-    function handleOnDrop(e: React.DragEvent){
+    async function handleOnDrop(e: React.DragEvent){
         e.preventDefault();
         const droppedTask: TaskType = JSON.parse(e.dataTransfer.getData("task"));
+
+        const newPositionIndex = tasks.length;
         
         if(droppedTask.originSlotId !== slotId){
-            setTasks([...tasks, {...droppedTask, originSlotId: slotId}]);
 
-            // Dispatch an event to delete the task from the original slot
-            console.log(droppedTask);
-            const event = new CustomEvent("deleteTask", { detail: { taskId: droppedTask.task_id, slotId: droppedTask.originSlotId } });
-            window.dispatchEvent(event);
+            const updatedTask = {
+                ...droppedTask,
+                originSlotId: slotId,
+                slot_id: slotId,
+                positionIndex: newPositionIndex
+            }
+
+            const response = await updateTask(droppedTask.task_id, slotId, droppedTask.content, droppedTask.positionIndex);
+            if(response){
+                setTasks([...tasks, {...updatedTask, is_first_editing_task: false}]);
+
+                // Dispatch an event to delete the task from the original slot
+                // console.log(droppedTask);
+                const event = new CustomEvent("deleteTask", { detail: { taskId: droppedTask.task_id, slotId: droppedTask.originSlotId } });
+                window.dispatchEvent(event);
+            }
+            
         }
         
     }
@@ -183,7 +198,7 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
         const customEvent = e as CustomEvent<{ taskId: string; slotId: string }>; // Type assertion
         // console.log(customEvent);
         if (customEvent.detail.slotId === slotId) {
-            await deleteTask(customEvent.detail.taskId);
+            setTasks((prevTasks) => prevTasks.filter((task) => task.task_id !== customEvent.detail.taskId));
         }
     });
 
@@ -209,9 +224,7 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
 						});
 						return updatedTasks;
 					})
-				} else {
-                    console.error("tasks not found");
-                }
+				}
 			} catch (err){
 				console.error("Something wrong happened when fetching tasks", err);
 			}
@@ -257,7 +270,7 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
                         id={task.task_id} 
                         content={task.content}
                         isFirstEditingTask={task.is_first_editing_task}
-                        onDelete={async () => await deleteTask(task.task_id)} 
+                        onDelete={async () => await deleteTask(task.task_id, task.slot_id)} 
                         onEdit={editTask} 
                         handleDrag={(e) => handleOnDragStart(e, task)} 
                     />

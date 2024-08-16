@@ -14,6 +14,9 @@ function Task({id, content, isFirstEditingTask, onDelete, onEdit, handleDrag}: T
 	const [newContent, setNewContent] = useState<string>(content);// initialise le contenu d'une tâche
 	const [isDraggable, setIsDraggable] = useState<boolean>(true);
 
+
+	
+
 	function handleEdit(){ //gère l'état de l'autorisation pour modifier une tâche
 		setIsEditing(true);
 		setIsDraggable(false)
@@ -23,11 +26,13 @@ function Task({id, content, isFirstEditingTask, onDelete, onEdit, handleDrag}: T
 		if(newContent === ""){ //empêche d'avoir une tâche vide
 			onEdit(id, "nouvelle tâche");
 			setIsEditing(false);
+			isFirstEditingTask = false;
 			setIsDraggable(true)
 			return
 		}
 		onEdit(id, newContent);
 		setIsEditing(false);
+		isFirstEditingTask = false;
 		setIsDraggable(true);
 	}
 

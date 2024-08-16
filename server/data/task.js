@@ -8,8 +8,8 @@ export async function getTasks(whereObj, orderBy){
     return null;
 }
 
-export async function getTask(task_id){
-    const result = await getOneBy("tasks", {task_id: task_id});
+export async function getTask(whereObj){
+    const result = await getOneBy("tasks", whereObj);
     if(result !== undefined){
         return result;
     }
@@ -30,6 +30,6 @@ export async function updateTask(task_id, content, positionIndex, slot_id){
     return result;
 }
 
-export async function deleteTask(task_id){
-    await deleteData("tasks", [["task_id", "=", task_id]]);
+export async function deleteTask(task_id, slot_id){
+    await deleteData("tasks", [["task_id", "=", task_id], ["slot_id", "=", slot_id]]);
 }

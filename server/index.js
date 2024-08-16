@@ -253,14 +253,14 @@ app.put("/api/update-task", async (req, res) => {
 });
 
 app.delete("/api/delete-task", async (req, res) => {
-    const { task_id } = req.body;
-    const existing_task = await TASK.getTask(task_id);
+    const { task_id, slot_id } = req.body;
+    const existing_task = await TASK.getTask({task_id, slot_id});
 
     if(existing_task){
-        await TASK.deleteTask(task_id);
+        await TASK.deleteTask(task_id, slot_id);
         return res.status(200).json({success: true, message: "Task successfully deleted"});
     } else {
-        return res.json({success: false, message: `Task: ${task_id} not found`});
+        return res.json({success: false, message: `Task: ${task_id} not found`, sended: req.body});
     }
 })
 
