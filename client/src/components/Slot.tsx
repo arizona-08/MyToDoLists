@@ -107,11 +107,37 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
         
     }
 
+    async function updateTask(task_id: string, slot_id: string, content: string, positionIndex: number){
+        const response = await axios.put("http://localhost:3000/api/update-task", {
+            data: {
+                task_id: task_id,
+                slot_id: slot_id,
+                content: content,
+                positionIndex: positionIndex
+            }
+        });
+
+        if(response.data.success){
+            return true;
+        } else {
+            return false
+        }
+    }
+
     //met à jour le tableau de tâche avec la tâche modifié
-    function editTask(taskId: string, newContent: string){
-        setTasks(tasks.map((task) =>
-            task.task_id === taskId ? { ...task, content: newContent } : task
-        ));
+    async function editTask(taskId: string, newContent: string){
+        const task = tasks.find((task) => task.task_id === taskId);
+        if(task !== undefined){
+            const response = await updateTask(task.task_id, task.slot_id, newContent, task.positionIndex );
+            if(response){
+                setTasks(tasks.map((task) =>
+                    task.task_id === taskId ? { ...task, content: newContent } : task
+                ));
+            }
+        } else {
+            console.error("task not found");
+        }
+        
     }
 
     /*Cette section sur la fonctionnalité du drag and drop des tâches */
@@ -193,6 +219,7 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
 
         getTasks();
     }, []);
+
     return (
         <div slot-id={slotId} onDrop={handleOnDrop} onDragOver={(e) => e.preventDefault()} className="w-72 h-fit bg-slate-300 p-3 rounded-md">
             <div className="slot-header flex justify-between items-center">

@@ -26,7 +26,7 @@ export async function createTask(task_id, content, positionIndex, slot_id){
 }
 
 export async function updateTask(task_id, content, positionIndex, slot_id){
-    const result = await update("tasks", {task_id: task_id, content: content, indexPosition: positionIndex, slot_id: slot_id});
+    const result = await update("tasks", {content: content, positionIndex: positionIndex, slot_id: slot_id}, {task_id: task_id});
     return result;
 }
 

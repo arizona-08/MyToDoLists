@@ -236,14 +236,19 @@ app.post("/api/create-task", async(req, res) => {
 });
 
 app.put("/api/update-task", async (req, res) => {
-    const {task_id, content, positionIndex, slot_id} = req.body;
+    const {task_id, content, positionIndex, slot_id} = req.body.data;
     const existing_slot = await SLOT.getSlot({char_id: slot_id});
 
     if(existing_slot){
-        await TASK.updateTask(task_id, content, positionIndex, slot_id);
-        return res.status(201).json({success: true, message: "task successfully created"});
+        try{
+            await TASK.updateTask(task_id, content, positionIndex, slot_id);
+            return res.status(201).json({success: true, message: "task successfully updated"});
+        } catch (err) {
+            throw new Error("Something went wrong when updating task");
+        }
+        
     } else {
-        return res.json({success: false, message: "Could not create task, slot not found"});
+        return res.json({success: false, message: "Could not create task, slot not found", sended: req.body});
     }
 });
 
