@@ -56,7 +56,7 @@ export async function insert(table, valuesObj){
     }
 }
 
-export async function get(table, whereObj = null){
+export async function get(table, whereObj = null, orderBy = null){
     const connection = await getConnection();
     
     try{
@@ -69,9 +69,16 @@ export async function get(table, whereObj = null){
                 query += `${key} = ? AND `;
             }
             query = query.slice(0, -5);
+
+            if(orderBy){
+                query += ` ORDER BY ${orderBy}`;
+            }
             const result = await connection.query(query, params);
             return result;
         } else {
+            if(orderBy){
+                query += ` ORDER BY ${orderBy}`;
+            }
             const result = await connection.query(query);
             return result;
         }

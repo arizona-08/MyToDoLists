@@ -7,6 +7,7 @@ import { access, writeFile } from "fs/promises";
 import * as USER from "./data/user.js";
 import * as BOARD from "./data/board.js";
 import * as SLOT from "./data/slot.js";
+import * as TASK from "./data/task.js";
 
 
 dotenv.config();
@@ -212,9 +213,51 @@ app.delete("/api/delete-slot", async(req, res) => {
 
 // -------- TASKS RELATED ROUTES --------
 
-app.get("/api/tasks", (request, response) => {
-    response.send("hello worlds");
+app.get("/api/get-tasks", async (req, res) => {
+    const {slot_id} = req.query;
+    const tasks = await TASK.getTasks({slot_id: slot_id}, "positionIndex");
+    if(tasks){
+        return res.status(200).json({success: true, tasks: tasks});
+    } else {
+        return res.json({success: false, message: `Tasks for slot: ${slot_id} not found`})
+    }
 });
+
+app.post("/api/create-task", async(req, res) => {
+    const {task_id, content, positionIndex, slot_id} = req.body.data;
+    const existing_slot = await SLOT.getSlot({char_id: slot_id});
+
+    if(existing_slot){
+        await TASK.createTask(task_id, content, positionIndex, slot_id);
+        return res.status(201).json({success: true, message: "task successfully created"});
+    } else {
+        return res.json({success: false, message: "Could not create task, slot not found", sended: req.body});
+    }
+});
+
+app.put("/api/update-task", async (req, res) => {
+    const {task_id, content, positionIndex, slot_id} = req.body;
+    const existing_slot = await SLOT.getSlot({char_id: slot_id});
+
+    if(existing_slot){
+        await TASK.updateTask(task_id, content, positionIndex, slot_id);
+        return res.status(201).json({success: true, message: "task successfully created"});
+    } else {
+        return res.json({success: false, message: "Could not create task, slot not found"});
+    }
+});
+
+app.delete("/api/delete-task", async (req, res) => {
+    const { task_id } = req.body;
+    const existing_task = await TASK.getTask(task_id);
+
+    if(existing_task){
+        await TASK.deleteTask(task_id);
+        return res.status(200).json({success: true, message: "Task successfully deleted"});
+    } else {
+        return res.json({success: false, message: `Task: ${task_id} not found`});
+    }
+})
 
 
 app.listen(3000, () => console.log("app is running on http://localhost:3000"));

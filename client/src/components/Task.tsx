@@ -3,15 +3,16 @@ import { useState } from "react";
 interface TaskProps{
 	id: string;
 	content: string;
+	isFirstEditingTask: boolean
 	onDelete: () => void;
 	onEdit: (id: string, newContent: string) => void
 	handleDrag: (e: React.DragEvent, task: {id: string, content: string}) => void
 }
 
-function Task({id, content, onDelete, onEdit, handleDrag}: TaskProps) {
-	const [isEditing, setIsEditing] = useState<boolean>(true); //autorise par défaut la modification d'une tâche
+function Task({id, content, isFirstEditingTask, onDelete, onEdit, handleDrag}: TaskProps) {
+	const [isEditing, setIsEditing] = useState<boolean>(isFirstEditingTask); //autorise par défaut la modification d'une tâche
 	const [newContent, setNewContent] = useState<string>(content);// initialise le contenu d'une tâche
-	const [isDraggable, setIsDraggable] = useState<boolean>(false);
+	const [isDraggable, setIsDraggable] = useState<boolean>(true);
 
 	function handleEdit(){ //gère l'état de l'autorisation pour modifier une tâche
 		setIsEditing(true);

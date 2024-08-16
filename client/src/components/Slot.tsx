@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {v4 as uuidv4} from "uuid";
 import Task from "./Task";
 import axios from "axios";
@@ -12,9 +12,12 @@ interface SlotProps{
 }
 
 interface TaskType{
-    id: string;
+    task_id: string;
     content: string;
+    slot_id: string
     originSlotId: string;
+    is_first_editing_task: boolean;
+    positionIndex: number
 }
 
 function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotProps) {
@@ -67,20 +70,47 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
     }
 
     //permet d'ajouter un objet de type TaqkType au tableau défini juste en haut
-    function addTask(){
-        const newTask = {id: uuidv4(), content: "tache à faire", originSlotId: slotId}; //le slotId est passé dans les props
-        setTasks([...tasks, newTask]);
+    async function addTask(){
+        const newPosIndex = tasks.length;
+        const newTask = {task_id: uuidv4(), content: "tache à faire", slot_id: slotId, originSlotId: slotId, is_first_editing_task: true, positionIndex: newPosIndex}; //le slotId est passé dans les props
+
+        const response = await axios.post("http://localhost:3000/api/create-task", {
+            data:{
+                task_id: newTask.task_id,
+                content: newTask.content,
+                positionIndex: newTask.positionIndex,
+                slot_id: newTask.originSlotId
+            }
+        });
+
+        if(response.data.success){
+            setTasks([...tasks, newTask]);
+        } else {
+            const message = response.request.response;
+            console.error("Couldn't add new task", message);
+        }
+        
     }
 
     //permet de supprimer une tâche grâce à son id
-    function deleteTask(taskId: string){
-        setTasks(tasks.filter((task) => task.id !== taskId));
+    async function deleteTask(taskId: string){
+        const response = await axios.delete("http://localhost:3000/api/delete-task", {
+            data: {
+                task_id: taskId
+            }
+        });
+        if(response.data.success){
+            setTasks(tasks.filter((task) => task.task_id !== taskId));
+        } else {
+            console.error("Couldn't delete task");
+        }
+        
     }
 
     //met à jour le tableau de tâche avec la tâche modifié
     function editTask(taskId: string, newContent: string){
         setTasks(tasks.map((task) =>
-            task.id === taskId ? { ...task, content: newContent } : task
+            task.task_id === taskId ? { ...task, content: newContent } : task
         ));
     }
 
@@ -96,7 +126,7 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
     function handleDragOver(e: React.DragEvent, index: number){
         e.preventDefault();
         if(draggedTask && draggedTask.originSlotId === slotId){
-            const draggedTaskIndex = tasks.findIndex((task) => task.id === draggedTask.id);
+            const draggedTaskIndex = tasks.findIndex((task) => task.positionIndex === draggedTask.positionIndex);
             if(draggedTaskIndex !== index){
                 const reorderedTasks = [...tasks]; //crée une copie du tableau de tâche
                 const [removedTask] = reorderedTasks.splice(draggedTaskIndex, 1); //supprime la tâche grâce à son index
@@ -114,19 +144,55 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
             setTasks([...tasks, {...droppedTask, originSlotId: slotId}]);
 
             // Dispatch an event to delete the task from the original slot
-            const event = new CustomEvent("deleteTask", { detail: { taskId: droppedTask.id, slotId: droppedTask.originSlotId } });
+            console.log(droppedTask);
+            const event = new CustomEvent("deleteTask", { detail: { taskId: droppedTask.task_id, slotId: droppedTask.originSlotId } });
             window.dispatchEvent(event);
         }
         
     }
    
     // Listen for the custom event to delete the task
-    window.addEventListener("deleteTask", (e: Event) => {
+    window.addEventListener("deleteTask", async (e: Event) => {
+        
         const customEvent = e as CustomEvent<{ taskId: string; slotId: string }>; // Type assertion
+        // console.log(customEvent);
         if (customEvent.detail.slotId === slotId) {
-            deleteTask(customEvent.detail.taskId);
+            await deleteTask(customEvent.detail.taskId);
         }
     });
+
+    useEffect(() => {
+        //fetch all tasks
+        async function getTasks(){
+			try{
+				const response = await axios.get("http://localhost:3000/api/get-tasks", {
+					params: {
+						slot_id: slotId
+					}
+				});
+
+				if(response.data.success){
+					const fetchedTasks = response.data.tasks;
+					setTasks((prevTasks) => {
+						const updatedTasks = [...prevTasks];
+						fetchedTasks.forEach((task: TaskType) => {
+							// Ensure no duplicates are added
+							if (!updatedTasks.some((t) => t.task_id === task.task_id)) {
+								updatedTasks.push({...task, is_first_editing_task: false, originSlotId: slotId});
+							}
+						});
+						return updatedTasks;
+					})
+				} else {
+                    console.error("tasks not found");
+                }
+			} catch (err){
+				console.error("Something wrong happened when fetching tasks", err);
+			}
+		}
+
+        getTasks();
+    }, []);
     return (
         <div slot-id={slotId} onDrop={handleOnDrop} onDragOver={(e) => e.preventDefault()} className="w-72 h-fit bg-slate-300 p-3 rounded-md">
             <div className="slot-header flex justify-between items-center">
@@ -155,15 +221,16 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
             <div className="task-container">
             {tasks.map((task, index) => (
                 <div
-                    key={task.id}
+                    key={task.task_id}
                     onDragOver={(e) => handleDragOver(e, index)}
                     onDrop={handleOnDrop}
                 >
                     <Task 
-                        key={task.id} 
-                        id={task.id} 
-                        content={task.content} 
-                        onDelete={() => deleteTask(task.id)} 
+                        key={task.task_id} 
+                        id={task.task_id} 
+                        content={task.content}
+                        isFirstEditingTask={task.is_first_editing_task}
+                        onDelete={async () => await deleteTask(task.task_id)} 
                         onEdit={editTask} 
                         handleDrag={(e) => handleOnDragStart(e, task)} 
                     />
@@ -171,7 +238,7 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
             ))}
             </div>
             <div className="button-container flex justify-center">
-                <button onClick={() => addTask()} className="bg-green-500 text-white px-3 py-2 rounded-md mt-3 hover:bg-green-600">Ajouter une tâche +</button>
+                <button onClick={async () => await addTask()} className="bg-green-500 text-white px-3 py-2 rounded-md mt-3 hover:bg-green-600">Ajouter une tâche +</button>
             </div>
         </div>
     )
