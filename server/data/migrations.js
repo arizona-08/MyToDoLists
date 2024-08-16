@@ -65,7 +65,7 @@ async function create_boards_table(){
             id INT AUTO_INCREMENT PRIMARY KEY,
             board_name VARCHAR(20),
             user_id INT,
-            FOREIGN KEY (user_id) REFERENCES users(id)
+            CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         )`;
         await connection.query(query);
     } catch (err){
@@ -87,7 +87,7 @@ async function create_slots_table(){
             char_id UUID UNIQUE,
             title VARCHAR(20),
             board_id INT,
-            FOREIGN KEY (board_id) REFERENCES boards(id)
+            CONSTRAINT fk_board_id FOREIGN KEY (board_id) REFERENCES boards(id) ON DELETE CASCADE
         )`;
         await connection.query(query);
     } catch (err){
@@ -107,10 +107,10 @@ async function create_tasks_table(){
         CREATE TABLE IF NOT EXISTS tasks(
             id INT AUTO_INCREMENT PRIMARY KEY,
             task_id UUID UNIQUE,
-            content VARCHAR(20),
+            content VARCHAR(50),
             positionIndex INT,
             slot_id UUID,
-            FOREIGN KEY (slot_id) REFERENCES slots(char_id)
+            CONSTRAINT fk_slot_id FOREIGN KEY (slot_id) REFERENCES slots(char_id) ON DELETE CASCADE
         )`;
         await connection.query(query);
     } catch (err){
