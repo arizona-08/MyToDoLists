@@ -7,9 +7,10 @@ interface TaskProps{
 	onDelete: () => void;
 	onEdit: (id: string, newContent: string) => void
 	handleDrag: (e: React.DragEvent, task: {id: string, content: string}) => void
+	handleDragEnd: () => void
 }
 
-function Task({id, content, isFirstEditingTask, onDelete, onEdit, handleDrag}: TaskProps) {
+function Task({id, content, isFirstEditingTask, onDelete, onEdit, handleDrag, handleDragEnd}: TaskProps) {
 	const [isEditing, setIsEditing] = useState<boolean>(isFirstEditingTask); //autorise par défaut la modification d'une tâche
 	const [newContent, setNewContent] = useState<string>(content);// initialise le contenu d'une tâche
 	const [isDraggable, setIsDraggable] = useState<boolean>(true);
@@ -45,7 +46,7 @@ function Task({id, content, isFirstEditingTask, onDelete, onEdit, handleDrag}: T
 	}
 
 	return (
-		<div task-id={id} draggable={isDraggable} onDragStart={drag} className="w-full bg-white rounded-md h-fit p-2 mb-2 flex justify-between items-start">
+		<div task-id={id} draggable={isDraggable} onDragStart={drag} onDragEnd={handleDragEnd} className="w-full bg-white rounded-md h-fit p-2 mb-2 flex justify-between items-start cursor-grab">
 			{
 				isEditing ? (
 					<input 
@@ -62,10 +63,10 @@ function Task({id, content, isFirstEditingTask, onDelete, onEdit, handleDrag}: T
 			}
 			
 			<div className="actions flex gap-1">
-				<div onClick={handleEdit} className="modify bg-blue-500 hover:bg-blue-600 w-6 h-6 p-1 rounded-md">
+				<div onClick={handleEdit} className="modify w-6 h-6 p-1 rounded-md hover:border transition-all">
 					<img className="w-full" src="../../pen.png" alt="modifier" />
 				</div>
-				<div onClick={onDelete} className="delete bg-red-500 hover:bg-red-600 w-6 h-6 p-1 rounded-md">
+				<div onClick={onDelete} className="delete w-6 h-6 p-1 rounded-md hover:border transition-all">
 					<img className="w-full" src="../../trash.png" alt="supprimer" />
 				</div>
 			</div>
