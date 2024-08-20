@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import {v4 as uuidv4} from "uuid";
 import Task from "./Task";
 import axios from "axios";
-import DropArea from "./DropArea";
 
 interface SlotProps{
     slotId: string
@@ -25,7 +24,7 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
     const [isEditing, setIsEditing] = useState<boolean>(is_firstEditing); //gère l'état de la modification du tire
     const [newTitle, setNewTitle] = useState<string>(title); //gère le nouveau titre
     const [tasks, setTasks] = useState<TaskType[]>([]); //crée un tableu d'obket de type TaskType
-    const [draggedTask, setDraggedTask] = useState<TaskType | null>(null);
+    // const [draggedTask, setDraggedTask] = useState<TaskType | null>(null);
 
     //permet d'autoriser la modification du titre
     function handleTitleEdit(){
@@ -152,7 +151,7 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
 
     //pour bouger une tâche au sein d'un même slot
     function handleOnDragStart(e: React.DragEvent, task: TaskType){
-        setDraggedTask(task);
+        // setDraggedTask(task);
         e.dataTransfer.effectAllowed = "move";
         e.dataTransfer.setData("task", JSON.stringify(task));
     }
@@ -166,10 +165,10 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
     //             const [removedTask] = reorderedTasks.splice(draggedTaskIndex, 1); //supprime la tâche grâce à son index
     //             reorderedTasks.splice(index, 0, removedTask); // ajoute la tâche dans le tableau de tâches à l'index demandé
 
-    //             const updatedTasks = reorderedTasks.map((task, i) => ({
-    //                 ...task,
-    //                 positionIndex: i
-    //             }));
+    //             // const updatedTasks = reorderedTasks.map((task, i) => ({
+    //             //     ...task,
+    //             //     positionIndex: i
+    //             // }));
 
     //             // setTasks(updatedTasks);// met à jour le tableau de tâches
 
@@ -177,6 +176,7 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
     //         }
     //     }
     // }
+
 
     async function handleOnDrop(e: React.DragEvent, position: number){
         e.preventDefault();
@@ -201,16 +201,8 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
 
             const event = new CustomEvent("deleteTask", { detail: { taskId: droppedTask.task_id, slotId: droppedTask.originSlotId } });
             window.dispatchEvent(event);
+            updatedTask.originSlotId = slotId; // met à jour l'originSlotId
         }
-
-        // const response = await updateTask(updatedTask.task_id, slotId, updatedTask.content, updatedTask.positionIndex);
-        // if(response){
-        //     setTasks([...tasks, {...updatedTask, is_first_editing_task: false}]);
-
-        //     // Dispatch an event to delete the task from the original slot
-        //     // console.log(droppedTask);
-           
-        // }
         
     }
    
@@ -256,7 +248,11 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
     }, []);
 
     return (
-        <div slot-id={slotId} onDragOver={(e) => e.preventDefault()} className="w-72 h-fit bg-slate-300 p-3 rounded-md">
+        <div
+        slot-id={slotId}
+        // onDrop={(e) => handleDropOnSlot(e)}
+        onDragOver={(e) => e.preventDefault()}
+        className="w-72 h-fit bg-slate-300 p-3 rounded-md">
             <div className="slot-header flex justify-between items-center">
                 <p onClick={handleTitleEdit} className="font-medium text-[20px] mb-2">
                     {
@@ -280,27 +276,57 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
                 </div>
             </div>
             
-            <div className="task-container">
-                <DropArea onDrop={handleOnDrop} position={0}/>
-                {tasks.map((task, index) => (
+            <div className="tasks-container">
+                {
+                    (tasks.length === 0 &&
+                        <div
+                            
+                            // onDragOver={(e) => handleDragOver(e, index)}
+                            onDrop={(e) => handleOnDrop(e, 0)}
+                            className="w-full h-5"
+                        
+                        ></div>
+                    ) ||
+
+                    tasks.map((task, index) => (
+                        <div
+                            key={index}
+                            // onDragOver={(e) => handleDragOver(e, index)}
+                            onDrop={(e) => handleOnDrop(e, index)}
+                            
+                        >
+                            <Task 
+                                key={index} 
+                                id={task.task_id} 
+                                content={task.content}
+                                isFirstEditingTask={task.is_first_editing_task}
+                                onDelete={async () => await deleteTask(task.task_id, task.slot_id)} 
+                                onEdit={editTask} 
+                                handleDrag={(e) => handleOnDragStart(e, task)}
+                                // handleDragEnd={() => setDraggedTask(null)}
+                            />
+                        </div>
+                    ))
+                }
+                {/* {tasks.map((task, index) => (
                     <div
-                        key={task.task_id}
+                        key={index}
                         // onDragOver={(e) => handleDragOver(e, index)}
+                        onDrop={(e) => handleOnDrop(e, index)}
                         
                     >
                         <Task 
-                            key={task.task_id} 
+                            key={index} 
                             id={task.task_id} 
                             content={task.content}
                             isFirstEditingTask={task.is_first_editing_task}
                             onDelete={async () => await deleteTask(task.task_id, task.slot_id)} 
                             onEdit={editTask} 
                             handleDrag={(e) => handleOnDragStart(e, task)}
-                            handleDragEnd={() => setDraggedTask(null)}
+                            // handleDragEnd={() => setDraggedTask(null)}
                         />
-                        <DropArea key={index} onDrop={handleOnDrop} position={index + 1}/>
                     </div>
-                ))}
+                ))} */}
             </div>
             <div className="button-container flex justify-center">
                 <button onClick={async () => await addTask()} className="bg-green-500 text-white px-3 py-2 rounded-md mt-3 hover:bg-green-600">Ajouter une tâche +</button>

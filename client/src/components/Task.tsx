@@ -7,10 +7,10 @@ interface TaskProps{
 	onDelete: () => void;
 	onEdit: (id: string, newContent: string) => void
 	handleDrag: (e: React.DragEvent, task: {id: string, content: string}) => void
-	handleDragEnd: () => void
+	// handleDragEnd: () => void
 }
 
-function Task({id, content, isFirstEditingTask, onDelete, onEdit, handleDrag, handleDragEnd}: TaskProps) {
+function Task({id, content, isFirstEditingTask, onDelete, onEdit, handleDrag}: TaskProps) {
 	const [isEditing, setIsEditing] = useState<boolean>(isFirstEditingTask); //autorise par défaut la modification d'une tâche
 	const [newContent, setNewContent] = useState<string>(content);// initialise le contenu d'une tâche
 	const [isDraggable, setIsDraggable] = useState<boolean>(true);
@@ -46,7 +46,11 @@ function Task({id, content, isFirstEditingTask, onDelete, onEdit, handleDrag, ha
 	}
 
 	return (
-		<div task-id={id} draggable={isDraggable} onDragStart={drag} onDragEnd={handleDragEnd} className="w-full bg-white rounded-md h-fit p-2 mb-2 flex justify-between items-start cursor-grab">
+		<div task-id={id}
+		draggable={isDraggable}
+		onDragStart={drag}
+		// onDragEnd={handleDragEnd}
+		className="w-full bg-white rounded-md h-fit p-2 mb-2 flex justify-between items-start cursor-grab">
 			{
 				isEditing ? (
 					<input 
