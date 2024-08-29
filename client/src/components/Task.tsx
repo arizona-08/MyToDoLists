@@ -3,15 +3,20 @@ import { useState } from "react";
 interface TaskProps{
 	id: string;
 	content: string;
+	isFirstEditingTask: boolean
 	onDelete: () => void;
 	onEdit: (id: string, newContent: string) => void
 	handleDrag: (e: React.DragEvent, task: {id: string, content: string}) => void
+	// handleDragEnd: () => void
 }
 
-function Task({id, content, onDelete, onEdit, handleDrag}: TaskProps) {
-	const [isEditing, setIsEditing] = useState<boolean>(true); //autorise par défaut la modification d'une tâche
+function Task({id, content, isFirstEditingTask, onDelete, onEdit, handleDrag}: TaskProps) {
+	const [isEditing, setIsEditing] = useState<boolean>(isFirstEditingTask); //autorise par défaut la modification d'une tâche
 	const [newContent, setNewContent] = useState<string>(content);// initialise le contenu d'une tâche
-	const [isDraggable, setIsDraggable] = useState<boolean>(false);
+	const [isDraggable, setIsDraggable] = useState<boolean>(true);
+
+
+	
 
 	function handleEdit(){ //gère l'état de l'autorisation pour modifier une tâche
 		setIsEditing(true);
@@ -22,11 +27,13 @@ function Task({id, content, onDelete, onEdit, handleDrag}: TaskProps) {
 		if(newContent === ""){ //empêche d'avoir une tâche vide
 			onEdit(id, "nouvelle tâche");
 			setIsEditing(false);
+			isFirstEditingTask = false;
 			setIsDraggable(true)
 			return
 		}
 		onEdit(id, newContent);
 		setIsEditing(false);
+		isFirstEditingTask = false;
 		setIsDraggable(true);
 	}
 
@@ -39,7 +46,11 @@ function Task({id, content, onDelete, onEdit, handleDrag}: TaskProps) {
 	}
 
 	return (
-		<div task-id={id} draggable={isDraggable} onDragStart={drag} className="w-full bg-white rounded-md h-fit p-2 mb-2 flex justify-between items-start">
+		<div task-id={id}
+		draggable={isDraggable}
+		onDragStart={drag}
+		// onDragEnd={handleDragEnd}
+		className="w-full bg-white rounded-md h-fit p-2 mb-2 flex justify-between items-start cursor-grab">
 			{
 				isEditing ? (
 					<input 
@@ -56,11 +67,11 @@ function Task({id, content, onDelete, onEdit, handleDrag}: TaskProps) {
 			}
 			
 			<div className="actions flex gap-1">
-				<div onClick={handleEdit} className="modify bg-blue-500 hover:bg-blue-600 w-6 h-6 p-1 rounded-md">
-					<img className="w-full" src="pen.png" alt="modifier" />
+				<div onClick={handleEdit} className="modify w-6 h-6 p-1 rounded-md hover:border transition-all">
+					<img className="w-full" src="../../pen.png" alt="modifier" />
 				</div>
-				<div onClick={onDelete} className="delete bg-red-500 hover:bg-red-600 w-6 h-6 p-1 rounded-md">
-					<img className="w-full" src="trash.png" alt="supprimer" />
+				<div onClick={onDelete} className="delete w-6 h-6 p-1 rounded-md hover:border transition-all">
+					<img className="w-full" src="../../trash.png" alt="supprimer" />
 				</div>
 			</div>
 		</div>
