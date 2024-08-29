@@ -22,7 +22,18 @@ function Navbar() {
 	}
 
 	return (
-		<div className="navbar p-4 bg-black text-white flex justify-between items-center">
+		<div className="
+			navbar 
+			p-4
+			bg-blue-500
+			text-white
+			flex
+			justify-between
+			items-center
+			relative
+			top-0
+			w-full
+			">
 			<h1 className="text-6xl font-semibold"><Link to={"/"}>MyLists</Link></h1>
 
 			{is_logged && 

@@ -53,6 +53,22 @@ function AllLists() {
 		setShowCreatePreviewForm(false);
 	}
 
+	async function deleteBoard(auth_token: string | undefined, board_id: number){
+		const response = await axios.delete("http://localhost:3000/api/delete-board",{
+			data: {
+				auth_token,
+				board_id
+			}
+		});
+	
+		if(response.data.success){
+			setBoards(boards.filter((board) => board.id !== board_id));
+			console.log("Successfully deleted board");
+		} else {
+			console.error("couldn't delete board");
+		}
+	}
+
 	useEffect(() => {
 
 		if(!is_logged){
@@ -93,7 +109,7 @@ function AllLists() {
 		return (
 			<>
 				<Navbar/>
-				<div className="container p-4">
+				<div className="container p-4 mt-6">
 					<h2 className="text-3xl font-bold mb-2">Mes ToDoLists</h2>
 					{showCreatePreviewForm && <CreatePreviewForm createPreview={addBoardPreview} onClose={handleOnClose}/>} {/*affichage du formulaire si show showCreatePreviewForm*/}
 					
@@ -101,7 +117,7 @@ function AllLists() {
 					<button onClick={() => setShowCreatePreviewForm(true)} className="p-2 bg-blue-500 rounded-md mb-2 text-white">Ajouter une ToDoList</button>
 					<div className="boardsContainer flex flex-wrap gap-2">
 						{boards.map((preview, index) => (
-							<BoardPreview key={index} boardPreviewName={preview.board_name} auth_token={user_token} board_id={preview.id}/>
+							<BoardPreview key={index} boardPreviewName={preview.board_name} auth_token={user_token} board_id={preview.id} onDelete={async () => await deleteBoard(auth_token, preview.id)}/>
 						))}
 					</div>
 				</div>

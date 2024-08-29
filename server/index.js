@@ -151,6 +151,34 @@ app.get('/api/get-board', async (req, res) => {
     }
 });
 
+app.delete("/api/delete-board", async (req, res) => {
+    const {auth_token, board_id} = req.body;
+    const board = await BOARD.getBoardWithJoin(
+        [ 
+            ["boards.board_name", "b_name"]
+        ], 
+        "users",
+        [
+            ["boards.user_id", "users.id"]
+        ], 
+        [
+            ["users.auth_token", auth_token],
+            ["boards.id", board_id]
+        ]
+    );
+
+    if(board){
+        try{
+            await BOARD.deleteBoard([["id", "=", board_id]]);
+            res.status(200).json({success: true, message: `successfully deleted ${board.b_name}`});
+        }catch (err) {
+            console.error(err);
+        }
+    } else {
+        res.json({success: false, message: "board not found"});
+    }
+})
+
 // -------- SLOT RELATED ROUTES --------
 
 app.post("/api/create-slot", async (req, res) => {

@@ -64,7 +64,7 @@ function LoginPage() {
     return (
         <>
             <Navbar/>
-            <div className="w-full">
+            <div className="w-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex justify-center">
                 <form action="" className="sm:w-full md:w-1/2 lg:w-1/3 p-5 border rounded-md mt-6 flex flex-col items-center m-auto">
                     <h1 className="text-2xl font-medium mb-5 ">Conexion</h1>
                     <div className="flex flex-col items-center gap-3 w-full">

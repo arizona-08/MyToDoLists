@@ -26,6 +26,11 @@ export async function getSingleBoard(whereObj){
     return result;
 }
 
+export async function deleteBoard(whereArray){
+    const result = await deleteData("boards", whereArray);
+    return result;
+}
+
 // [ // column as alias
 //     ["users.id", "u_id"], 
 //     ["boards.id", "b_id"], 
