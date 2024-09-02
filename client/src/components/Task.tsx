@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface TaskProps{
 	id: string;
@@ -15,7 +15,12 @@ function Task({id, content, isFirstEditingTask, onDelete, onEdit, handleDrag}: T
 	const [newContent, setNewContent] = useState<string>(content);// initialise le contenu d'une tâche
 	const [isDraggable, setIsDraggable] = useState<boolean>(true);
 
-
+	useEffect(() => {
+        setNewContent(content);
+		if(isEditing){
+			setIsDraggable(false);
+		}
+    }, [content, isEditing]);
 	
 
 	function handleEdit(){ //gère l'état de l'autorisation pour modifier une tâche

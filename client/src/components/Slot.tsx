@@ -125,7 +125,7 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
         }
     }
 
-    function updateTasksPositions(updatedTasks: TaskType[]){
+    async function updateTasksPositions(updatedTasks: TaskType[]){
         updatedTasks.forEach(async (task, index) => {
             await updateTask(task.task_id, task.slot_id, task.content, index);
         })
@@ -156,27 +156,6 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
         e.dataTransfer.setData("task", JSON.stringify(task));
     }
 
-    // function handleDragOver(e: React.DragEvent, index: number){
-    //     e.preventDefault();
-    //     if(draggedTask && draggedTask.originSlotId === slotId){
-    //         const draggedTaskIndex = tasks.findIndex((task) => task.positionIndex === draggedTask.positionIndex);
-    //         if(draggedTaskIndex !== index){
-    //             const reorderedTasks = [...tasks]; //crée une copie du tableau de tâche
-    //             const [removedTask] = reorderedTasks.splice(draggedTaskIndex, 1); //supprime la tâche grâce à son index
-    //             reorderedTasks.splice(index, 0, removedTask); // ajoute la tâche dans le tableau de tâches à l'index demandé
-
-    //             // const updatedTasks = reorderedTasks.map((task, i) => ({
-    //             //     ...task,
-    //             //     positionIndex: i
-    //             // }));
-
-    //             // setTasks(updatedTasks);// met à jour le tableau de tâches
-
-    //             // updateTasksPositions(updatedTasks);
-    //         }
-    //     }
-    // }
-
 
     async function handleOnDrop(e: React.DragEvent, position: number){
         e.preventDefault();
@@ -190,12 +169,14 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
             positionIndex: newPositionIndex
         }
 
-        console.log(`new indexPosition: ${updatedTask.positionIndex}`, updatedTask);
-
         const reorderedTasks = tasks.filter((task) => task.task_id !== updatedTask.task_id);
         reorderedTasks.splice(position, 0, updatedTask);
+        for (let i = 0; i < reorderedTasks.length; i++) {
+            reorderedTasks[i].positionIndex = i;
+        }
+
         setTasks(reorderedTasks);
-        updateTasksPositions(reorderedTasks);
+        await updateTasksPositions(reorderedTasks);
 
         if(droppedTask.originSlotId !== slotId){
 
@@ -245,7 +226,7 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
 		}
 
         getTasks();
-    }, []);
+    }, [slotId]);
 
     return (
         <div
@@ -308,25 +289,6 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
                         </div>
                     ))
                 }
-                {/* {tasks.map((task, index) => (
-                    <div
-                        key={index}
-                        // onDragOver={(e) => handleDragOver(e, index)}
-                        onDrop={(e) => handleOnDrop(e, index)}
-                        
-                    >
-                        <Task 
-                            key={index} 
-                            id={task.task_id} 
-                            content={task.content}
-                            isFirstEditingTask={task.is_first_editing_task}
-                            onDelete={async () => await deleteTask(task.task_id, task.slot_id)} 
-                            onEdit={editTask} 
-                            handleDrag={(e) => handleOnDragStart(e, task)}
-                            // handleDragEnd={() => setDraggedTask(null)}
-                        />
-                    </div>
-                ))} */}
             </div>
             <div className="button-container flex justify-center">
                 <button onClick={async () => await addTask()} className="bg-green-500 text-white px-3 py-2 rounded-md mt-3 hover:bg-green-600">Ajouter une tâche +</button>
