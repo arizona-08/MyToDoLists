@@ -31,31 +31,60 @@ function Navbar() {
 	}
 
 	return (
-		<div className="navbar py-4 px-7 relative top-0 w-full ">
+		<div className="mx-auto navbar py-4 px-7 relative top-0 w-full xl:max-w-7xl">
 			<div className="flex justify-between items-center">
-				<div className="logo w-60">
+				<div className="logo w-56">
 					<Link to={"/"}><img src={logo_inline} alt="logo"/></Link>
 				</div>
-				<BurgerMenu isActive={isActive} OnClick={handleOnClick}/>
+				<div className="sm:hidden">
+					<BurgerMenu isActive={isActive} OnClick={handleOnClick}/>
+				</div>
+
+				{/* Only shows at 640px and above */}
+				<div className="hidden sm:block">
+					<div className="navLinks">
+						<nav>
+							<ul className="flex gap-2 text-sm">
+								{is_logged ?
+									(
+										<>
+											<li className="inline-block p-2 border border-blue-500 bg-blue-500 hover:bg-blue-600 hover:border-blue-600 transition-all text-white uppercase font-semibold"><Link to={`/my-lists/${auth_token}`}>Mes listes</Link> </li>
+											<li className="inline-block p-2 border border-blue-500 text-blue-500 hover:border-blue-600 hover:text-blue-600 transition-all uppercase font-semibold"><span onClick={async () => await handleLogout()} className="cursor-pointer">Se Déconnecter</span></li>
+										</>
+										
+									)
+									:
+									(
+										<>
+											<li className="inline-block p-2 border border-blue-500 bg-blue-500 text-white uppercase font-semibold"><Link to={"/register"}>Créer un compte</Link> </li>
+											<li className="inline-block p-2 border border-blue-500 text-blue-500 uppercase font-semibold"><Link to={"/login"}>Se connecter</Link> </li>
+										</>
+									)
+								}
+								
+							</ul>
+						</nav>
+					</div>
+				</div>
 			</div>
 
 			{isActive &&
-				<div className="navLinks w-full h-fit bg-[#ffffff52] p-2 transition-all">
+				<div className="navLinks absolute z-10 w-full h-fit bg-[#ffffff52] backdrop-blur-sm p-2 transition-all sm:hidden">
 					<nav>
 						<ul>
 							{is_logged ?
 								(
 									<>
-										<li className="flex items-center gap-2"><Link to={`/my-lists/${auth_token}`}>Mes listes</Link> <img src={arrow} alt="flèche" /></li>
-										<li className="flex items-center gap-2"><span onClick={async () => await handleLogout()} className="cursor-pointer">Se Déconnecter</span><img src={arrow} alt="flèche" /></li>
+										<li><Link className="flex items-center gap-1" to={`/my-lists/${auth_token}`}><p>Mes listes</p><img src={arrow} alt="flèche" /></Link></li>
+										<li><span onClick={async () => await handleLogout()} className="cursor-pointer flex items-center gap-1">Se Déconnecter<img src={arrow} alt="flèche" /></span></li>
 									</>
 									
 								)
 								:
 								(
 									<>
-										<li className="flex items-center gap-2"><Link to={"/register"}>Créer un compte</Link> <img src={arrow} alt="flèche" /></li>
-										<li className="flex items-center gap-2"><Link to={"/login"}>Se connecter</Link> <img src={arrow} alt="flèche" /></li>
+										<li><Link className="flex items-center gap-1" to={"/register"}>Créer un compte<img src={arrow} alt="flèche" /></Link></li>
+										<li><Link className="flex items-center gap-1" to={"/login"}>Se connecter<img src={arrow} alt="flèche" /></Link></li>
 									</>
 								)
 							}
@@ -64,17 +93,6 @@ function Navbar() {
 					</nav>
 				</div>
 			}
-			
-
-			{/* {is_logged && 
-				<div>
-					<ul className="flex items-center gap-7">
-						<li className="underline"><Link to={`/my-lists/${auth_token}`}>Mes listes</Link></li>
-						<li><span onClick={async () => await handleLogout()} className="underline cursor-pointer">Se Déconnecter</span></li>
-					</ul>
-					
-				</div>
-			} */}
 		</div>
 	)
 }

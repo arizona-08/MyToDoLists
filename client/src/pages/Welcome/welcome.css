@@ -1,0 +1,53 @@
+.main{
+    section{
+        .task-icon:nth-child(1){
+            position: absolute;
+            top: 15%;
+            left: -2%;
+            z-index: -1;
+            animation: walker 3.5s ease-in 0.7s infinite alternate;
+        }
+        
+        .task-icon:nth-child(2){
+            position: absolute;
+            top: 35%;
+            right: 3%;
+            z-index: -1;
+            animation: walker 3.5s ease-in 0.1s infinite alternate;
+        }
+        
+        .task-icon:nth-child(3){
+            position: absolute;
+            top: 52%;
+            left: 5%;
+            z-index: -1;
+            animation: walker 3.5s ease-in 1s infinite alternate;
+        }
+        
+        .task-icon:nth-child(4){
+            position: absolute;
+            top: 70%;
+            right: 16%;
+            z-index: -1;
+            animation: walker 3.5s ease-in 0.4s infinite alternate;
+        }
+    }
+}
+
+@keyframes walker {
+    0%{
+        transform: translate(0%, 0%);
+    }
+
+    33%{
+        transform: translate(12%, -27%);
+    }
+
+    66%{
+        transform: translate(6%, -13%);
+    }
+
+    100%{
+        transform: translate(8%, 15%);
+    }
+}

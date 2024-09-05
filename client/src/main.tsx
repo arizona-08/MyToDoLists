@@ -7,7 +7,7 @@ import NotFoundPage from './pages/NotFoundPage.tsx'
 import Board from './components/Board.tsx'
 import RegisterPage from './pages/RegisterPage.tsx'
 import LoginPage from './pages/LoginPage.tsx'
-import Welcome from './pages/Welcome.tsx'
+import Welcome from './pages/Welcome/Welcome.tsx'
 import AuthProvider from './Context/AuthProvider.tsx'
 
 const router = createBrowserRouter([
