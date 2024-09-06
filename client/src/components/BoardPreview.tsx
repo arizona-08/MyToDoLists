@@ -14,7 +14,7 @@ function BoardPreview({ boardPreviewName, auth_token, board_id, onDelete }: Boar
   return (
     
     <div id="preview-container" className="w-full flex flex-row justify-between items-start border p-2 rounded-md hover:bg-gray-50">
-      <Link to={`/board/${auth_token}/${board_id}`} className="font-medium text-xl">
+      <Link to={`/board/${auth_token}/${board_id}`} className="font-medium text-xl inline-block w-full">
         <div>
           {boardPreviewName}
           <p className="text-gray-400 text-xs">Dernièrement modifié le: 01/09/24</p>
