@@ -31,7 +31,7 @@ function Navbar() {
 	}
 
 	return (
-		<div className="mx-auto navbar py-4 px-7 relative top-0 w-full xl:max-w-7xl">
+		<div className="mx-auto navbar py-4 px-7 relative top-0 w-full">
 			<div className="flex justify-between items-center">
 				<div className="logo w-56">
 					<Link to={"/"}><img src={logo_inline} alt="logo"/></Link>

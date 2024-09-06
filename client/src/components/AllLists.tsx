@@ -110,11 +110,11 @@ function AllLists() {
 			<>
 				<Navbar/>
 				<div className="container p-4 mt-6">
-					<h2 className="text-3xl font-bold mb-2">Mes ToDoLists</h2>
+					<h2 className="text-3xl font-bold mb-2">Mes listes</h2>
 					{showCreatePreviewForm && <CreatePreviewForm createPreview={addBoardPreview} onClose={handleOnClose}/>} {/*affichage du formulaire si show showCreatePreviewForm*/}
 					
 					{/* change l'état de showCreatePreviewForm */}
-					<button onClick={() => setShowCreatePreviewForm(true)} className="p-2 bg-blue-500 rounded-md mb-2 text-white">Ajouter une ToDoList</button>
+					<button onClick={() => setShowCreatePreviewForm(true)} className="p-2 bg-blue-500 mb-2 text-white">+ Créer une nouvelle liste</button>
 					<div className="boardsContainer flex flex-wrap gap-2">
 						{boards.map((preview, index) => (
 							<BoardPreview key={index} boardPreviewName={preview.board_name} auth_token={user_token} board_id={preview.id} onDelete={async () => await deleteBoard(auth_token, preview.id)}/>

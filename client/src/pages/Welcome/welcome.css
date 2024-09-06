@@ -1,34 +1,31 @@
 .main{
     section{
-        .task-icon:nth-child(1){
+        .task-icon{
             position: absolute;
+            z-index: -1;
+        }
+
+        .task-icon:nth-child(1){
             top: 15%;
             left: -2%;
-            z-index: -1;
             animation: walker 3.5s ease-in 0.7s infinite alternate;
         }
         
         .task-icon:nth-child(2){
-            position: absolute;
             top: 35%;
             right: 3%;
-            z-index: -1;
             animation: walker 3.5s ease-in 0.1s infinite alternate;
         }
         
         .task-icon:nth-child(3){
-            position: absolute;
             top: 52%;
             left: 5%;
-            z-index: -1;
             animation: walker 3.5s ease-in 1s infinite alternate;
         }
         
         .task-icon:nth-child(4){
-            position: absolute;
-            top: 70%;
+            top: 74.5%;
             right: 16%;
-            z-index: -1;
             animation: walker 3.5s ease-in 0.4s infinite alternate;
         }
     }
