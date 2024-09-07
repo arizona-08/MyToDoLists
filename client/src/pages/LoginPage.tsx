@@ -36,7 +36,7 @@ function LoginPage() {
     async function handleConfirm(e: React.MouseEvent){
         e.preventDefault();
         setErrors({});
-        // console.log(user);
+        
         const loggin_token = await login(email, password);
 
         if(!loggin_token){
@@ -65,11 +65,11 @@ function LoginPage() {
         <>
             <Navbar/>
             <div className="w-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex justify-center">
-                <form action="" className="sm:w-full md:w-1/2 lg:w-1/3 p-5 border rounded-md mt-6 flex flex-col items-center m-auto">
+                <form action="" className="w-full sm:w-3/4 md:w-1/2 lg:w-1/3 p-5 border rounded-md mt-6 flex flex-col items-center m-auto">
                     <h1 className="text-2xl font-medium mb-5 ">Conexion</h1>
                     <div className="flex flex-col items-center gap-3 w-full">
                         
-                        <div className="flex flex-col w-1/2">
+                        <div className="flex flex-col w-3/4">
                             <label htmlFor="email">Email:</label>
                             <input 
                                 type="text" 
@@ -79,7 +79,7 @@ function LoginPage() {
                             />
                         </div>
                         
-                        <div className="flex flex-col w-1/2">
+                        <div className="flex flex-col w-3/4">
                             <label htmlFor="password">Mot de passe:</label>
                             <input 
                                 type="password" 

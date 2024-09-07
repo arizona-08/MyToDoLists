@@ -13,19 +13,9 @@ interface Board{
 	user_id: number
 }
 
-interface User{
-	id: number,
-	name: string,
-	firstname: string,
-	email: string,
-	password: string,
-	auth_token: string,
-	is_logged: boolean
-}
 
 function AllLists() {
 	const [showCreatePreviewForm, setShowCreatePreviewForm] = useState<boolean>(false); //permet d'afficher le formulaire de cration d'une liste
-	const [user, setUser] = useState<User>();
 	const [boards, setBoards] = useState<Board[]>([]);
 	const urlParams = useParams();
 	const user_token = urlParams.user;
@@ -34,7 +24,7 @@ function AllLists() {
 
 	//ajoute une preview au tableau de preview
 	async function addBoardPreview(board_name: string){
-		const user_id = user?.id;
+		const user_id = auth_token;
 		await axios.post("http://localhost:3000/api/create-board", {board_name, user_id});
 
 		const request = await axios.get("http://localhost:3000/api/get-boards", {
@@ -53,6 +43,12 @@ function AllLists() {
 		setShowCreatePreviewForm(false);
 	}
 
+	function editTitle(newTitle: string, board_id: number){
+		setBoards(
+			boards.map((board) => board.id === board_id ? {...board, board_name: newTitle} : board)
+		)
+	}
+
 	async function deleteBoard(auth_token: string | undefined, board_id: number){
 		const response = await axios.delete("http://localhost:3000/api/delete-board",{
 			data: {
@@ -63,7 +59,6 @@ function AllLists() {
 	
 		if(response.data.success){
 			setBoards(boards.filter((board) => board.id !== board_id));
-			console.log("Successfully deleted board");
 		} else {
 			console.error("couldn't delete board");
 		}
@@ -71,19 +66,14 @@ function AllLists() {
 
 	useEffect(() => {
 
-		if(!is_logged){
-			navigate("/");
-		}
-
 		async function getBoards(){
 			const request = await axios.get("http://localhost:3000/api/get-boards", {
 				params: {
 					auth_token: user_token
 				}
 			});
-			// console.log(request);
+
 			if(request.data.user){
-				setUser(request.data.user);
 
 				const fetchedBoards = request.data.boards;
 				setBoards((prevBoards) => {
@@ -100,24 +90,21 @@ function AllLists() {
 		}
 
 		getBoards();
-	},[user_token])
+	},[user_token ,navigate])
 
-	// console.log(boards);
-	
-	// const response = request.then(response => console.log(response));
-	if(user){
+	if(auth_token && is_logged){
 		return (
 			<>
 				<Navbar/>
-				<div className="container p-4 mt-6">
-					<h2 className="text-3xl font-bold mb-2">Mes ToDoLists</h2>
+				<div className="container p-4 mt-3 sm:max-w-xl sm:mx-auto md:max-w-3xl lg:max-w-5xl">
+					<h2 className="text-4xl font-bold mb-2">Mes listes</h2>
 					{showCreatePreviewForm && <CreatePreviewForm createPreview={addBoardPreview} onClose={handleOnClose}/>} {/*affichage du formulaire si show showCreatePreviewForm*/}
 					
 					{/* change l'état de showCreatePreviewForm */}
-					<button onClick={() => setShowCreatePreviewForm(true)} className="p-2 bg-blue-500 rounded-md mb-2 text-white">Ajouter une ToDoList</button>
-					<div className="boardsContainer flex flex-wrap gap-2">
+					<button onClick={() => setShowCreatePreviewForm(true)} className="p-2 bg-blue-500 mb-2 text-white">+ Créer une nouvelle liste</button>
+					<div className="boardsContainer flex flex-wrap gap-2 mt-5">
 						{boards.map((preview, index) => (
-							<BoardPreview key={index} boardPreviewName={preview.board_name} auth_token={user_token} board_id={preview.id} onDelete={async () => await deleteBoard(auth_token, preview.id)}/>
+							<BoardPreview key={index} boardPreviewName={preview.board_name} auth_token={user_token} board_id={preview.id} onTitleEdit={editTitle} onDelete={async () => await deleteBoard(auth_token, preview.id)}/>
 						))}
 					</div>
 				</div>

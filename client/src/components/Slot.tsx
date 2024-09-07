@@ -24,7 +24,6 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
     const [isEditing, setIsEditing] = useState<boolean>(is_firstEditing); //gère l'état de la modification du tire
     const [newTitle, setNewTitle] = useState<string>(title); //gère le nouveau titre
     const [tasks, setTasks] = useState<TaskType[]>([]); //crée un tableu d'obket de type TaskType
-    // const [draggedTask, setDraggedTask] = useState<TaskType | null>(null);
 
     //permet d'autoriser la modification du titre
     function handleTitleEdit(){
@@ -138,7 +137,7 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
             const response = await updateTask(task.task_id, task.slot_id, newContent, task.positionIndex );
             if(response){
                 setTasks(tasks.map((task) =>
-                    task.task_id === taskId ? { ...task, content: newContent } : task
+                    task.task_id === taskId ? { ...task, content: newContent, is_first_editing_task: false } : task
                 ));
             }
         } else {
@@ -151,7 +150,6 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
 
     //pour bouger une tâche au sein d'un même slot
     function handleOnDragStart(e: React.DragEvent, task: TaskType){
-        // setDraggedTask(task);
         e.dataTransfer.effectAllowed = "move";
         e.dataTransfer.setData("task", JSON.stringify(task));
     }
@@ -191,7 +189,6 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
     window.addEventListener("deleteTask", async (e: Event) => {
         
         const customEvent = e as CustomEvent<{ taskId: string; slotId: string }>; // Type assertion
-        // console.log(customEvent);
         if (customEvent.detail.slotId === slotId) {
             setTasks((prevTasks) => prevTasks.filter((task) => task.task_id !== customEvent.detail.taskId));
         }
@@ -233,7 +230,7 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
         slot-id={slotId}
         // onDrop={(e) => handleDropOnSlot(e)}
         onDragOver={(e) => e.preventDefault()}
-        className="w-72 h-fit bg-slate-300 p-3 rounded-md">
+        className="shrink-0 w-72 h-fit bg-gray-200 p-3 rounded-md shadow-md">
             <div className="slot-header flex justify-between items-center">
                 <p onClick={handleTitleEdit} className="font-medium text-[20px] mb-2">
                     {
@@ -248,7 +245,7 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
                             className="w-full px-1 border border-gray-300 rounded-md"
                         />
                         ) : (
-                            <span>{title}</span> //affiche simplement le titre si pas en cours de modification
+                            <span className="text-gray-800">{title}</span> //affiche simplement le titre si pas en cours de modification
                         )
                     }
                 </p>
@@ -291,7 +288,7 @@ function Slot({slotId, title, is_firstEditing, onTitleEdit, onSlotDelete}: SlotP
                 }
             </div>
             <div className="button-container flex justify-center">
-                <button onClick={async () => await addTask()} className="bg-green-500 text-white px-3 py-2 rounded-md mt-3 hover:bg-green-600">Ajouter une tâche +</button>
+                <button onClick={async () => await addTask()} className=" text-gray-600 font-medium px-3 py-2 rounded-md mt-3 hover:bg-gray-300 transition-all">+ Ajouter une tâche</button>
             </div>
         </div>
     )

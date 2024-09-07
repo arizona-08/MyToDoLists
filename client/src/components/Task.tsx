@@ -54,8 +54,7 @@ function Task({id, content, isFirstEditingTask, onDelete, onEdit, handleDrag}: T
 		<div task-id={id}
 		draggable={isDraggable}
 		onDragStart={drag}
-		// onDragEnd={handleDragEnd}
-		className="w-full bg-white rounded-md h-fit p-2 mb-2 flex justify-between items-start cursor-grab">
+		className="w-full bg-white rounded-md h-fit p-2 mb-2 flex justify-between items-start cursor-grab hover:shadow-md">
 			{
 				isEditing ? (
 					<input 

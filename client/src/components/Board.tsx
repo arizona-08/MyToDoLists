@@ -118,7 +118,7 @@ function Board() {
 		return (
 			<>
 				<Navbar/>
-				<div className="mx-5 my-5">
+				<div className="mx-5 my-5 overflow-x-scroll basis-full">
 					<h1 className="text-5xl font-thin mb-6">{board?.board_name}</h1>
 					<button className="bg-blue-500 text-white px-3 py-2 rounded-md mb-3 hover:bg-blue-600" onClick={async () => await addSlot()}>Ajouter un slot +</button>
 					<div className="flex gap-6">

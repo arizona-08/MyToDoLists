@@ -12,7 +12,7 @@ function RegisterPage() {
     const navigate = useNavigate();
     function handleConfirm(e: React.MouseEvent){
         e.preventDefault();
-        // console.log(name, firstname, email, password);
+        
         axios.post("http://localhost:3000/api/create-user", {
             name: name,
             firstname: firstname,
@@ -39,10 +39,10 @@ function RegisterPage() {
         <div className='w-full h-screen'>
             <Navbar/>
             <div className="w-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex justify-center">
-                <form action="" className="sm:w-full md:w-1/2 lg:w-1/3 p-5 border rounded-md flex flex-col items-center">
+                <form action="" className="w-full sm:w-3/4 md:w-1/2 lg:w-1/3 p-5 border rounded-md flex flex-col items-center">
                     <h1 className="text-2xl font-medium mb-5 ">S'inscrire sur MyLists</h1>
                     <div className="flex flex-col items-center gap-3 w-full">
-                        <div className="flex flex-col w-1/2">
+                        <div className="flex flex-col w-3/4">
                             <label htmlFor="name">Nom:</label>
                             <input 
                                 type="text" 
@@ -52,7 +52,7 @@ function RegisterPage() {
                             />
                         </div>
                         
-                        <div className="flex flex-col w-1/2">
+                        <div className="flex flex-col w-3/4">
                             <label htmlFor="firstname">Prénom:</label>
                             <input 
                                 type="text" 
@@ -62,7 +62,7 @@ function RegisterPage() {
                             />
                         </div>
                         
-                        <div className="flex flex-col w-1/2">
+                        <div className="flex flex-col w-3/4">
                             <label htmlFor="email">Email:</label>
                             <input 
                                 type="text" 
@@ -72,7 +72,7 @@ function RegisterPage() {
                             />
                         </div>
                         
-                        <div className="flex flex-col w-1/2">
+                        <div className="flex flex-col w-3/4">
                             <label htmlFor="password">Mot de passe:</label>
                             <input 
                                 type="password" 

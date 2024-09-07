@@ -26,6 +26,11 @@ export async function getSingleBoard(whereObj){
     return result;
 }
 
+export async function updateBoard(setObj, whereObj){
+    const result = await update("boards", setObj, whereObj);
+    return result;
+}
+
 export async function deleteBoard(whereArray){
     const result = await deleteData("boards", whereArray);
     return result;

@@ -151,6 +151,23 @@ app.get('/api/get-board', async (req, res) => {
     }
 });
 
+app.patch("/api/update-board", async (req, res) => {
+    const {auth_token, board_id, newTitle} = req.body;
+    const existingUser = await USER.getUser({auth_token: auth_token});
+
+    if(existingUser){
+        try{
+            await BOARD.updateBoard({board_name: newTitle}, {user_id: existingUser.id, id: board_id});
+            res.status(200).json({success: true, message: "Successfully updated board name"});
+        } catch (err) {
+            console.error(`Something wrong happened when updating board ${board_id}`, err);
+            res.json({success: false, sended: req.body.data})
+        }
+    } else {
+        res.json({success: false, message: "user not found"})
+    }
+});
+
 app.delete("/api/delete-board", async (req, res) => {
     const {auth_token, board_id} = req.body;
     const board = await BOARD.getBoardWithJoin(
