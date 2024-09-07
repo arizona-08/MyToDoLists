@@ -13,19 +13,9 @@ interface Board{
 	user_id: number
 }
 
-interface User{
-	id: number,
-	name: string,
-	firstname: string,
-	email: string,
-	password: string,
-	auth_token: string,
-	is_logged: boolean
-}
 
 function AllLists() {
 	const [showCreatePreviewForm, setShowCreatePreviewForm] = useState<boolean>(false); //permet d'afficher le formulaire de cration d'une liste
-	const [user, setUser] = useState<User>();
 	const [boards, setBoards] = useState<Board[]>([]);
 	const urlParams = useParams();
 	const user_token = urlParams.user;
@@ -34,7 +24,7 @@ function AllLists() {
 
 	//ajoute une preview au tableau de preview
 	async function addBoardPreview(board_name: string){
-		const user_id = user?.id;
+		const user_id = auth_token;
 		await axios.post("http://localhost:3000/api/create-board", {board_name, user_id});
 
 		const request = await axios.get("http://localhost:3000/api/get-boards", {
@@ -76,19 +66,14 @@ function AllLists() {
 
 	useEffect(() => {
 
-		if(!is_logged){
-			navigate("/");
-		}
-
 		async function getBoards(){
 			const request = await axios.get("http://localhost:3000/api/get-boards", {
 				params: {
 					auth_token: user_token
 				}
 			});
-			// console.log(request);
+
 			if(request.data.user){
-				setUser(request.data.user);
 
 				const fetchedBoards = request.data.boards;
 				setBoards((prevBoards) => {
@@ -105,12 +90,9 @@ function AllLists() {
 		}
 
 		getBoards();
-	},[user_token, is_logged, navigate])
+	},[user_token ,navigate])
 
-	// console.log(boards);
-	
-	// const response = request.then(response => console.log(response));
-	if(user){
+	if(auth_token && is_logged){
 		return (
 			<>
 				<Navbar/>

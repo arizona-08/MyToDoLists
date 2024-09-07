@@ -36,7 +36,7 @@ function LoginPage() {
     async function handleConfirm(e: React.MouseEvent){
         e.preventDefault();
         setErrors({});
-        // console.log(user);
+        
         const loggin_token = await login(email, password);
 
         if(!loggin_token){

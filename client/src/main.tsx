@@ -29,12 +29,12 @@ const router = createBrowserRouter([
   {
     path: "/my-lists/:user",
     element: <AllLists/>,
-    // errorElement: <NotFoundPage/>
+    errorElement: <NotFoundPage/>
   },
   {
     path: "/board/:auth_token/:board_id",
     element: <Board/>,
-    // errorElement: <NotFoundPage/>
+    errorElement: <NotFoundPage/>
   },
   
 ])

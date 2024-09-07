@@ -12,7 +12,7 @@ function RegisterPage() {
     const navigate = useNavigate();
     function handleConfirm(e: React.MouseEvent){
         e.preventDefault();
-        // console.log(name, firstname, email, password);
+        
         axios.post("http://localhost:3000/api/create-user", {
             name: name,
             firstname: firstname,

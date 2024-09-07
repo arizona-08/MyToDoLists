@@ -16,8 +16,6 @@ function Navbar() {
 		setIsActive(!isActive);
 	}
 
-	// console.log(auth_token);
-
 	async function handleLogout(){
 		const response = await axios.patch("http://localhost:3000/api/logout", {auth_token});
 
