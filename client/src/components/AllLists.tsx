@@ -53,6 +53,12 @@ function AllLists() {
 		setShowCreatePreviewForm(false);
 	}
 
+	function editTitle(newTitle: string, board_id: number){
+		setBoards(
+			boards.map((board) => board.id === board_id ? {...board, board_name: newTitle} : board)
+		)
+	}
+
 	async function deleteBoard(auth_token: string | undefined, board_id: number){
 		const response = await axios.delete("http://localhost:3000/api/delete-board",{
 			data: {
@@ -63,7 +69,6 @@ function AllLists() {
 	
 		if(response.data.success){
 			setBoards(boards.filter((board) => board.id !== board_id));
-			console.log("Successfully deleted board");
 		} else {
 			console.error("couldn't delete board");
 		}
@@ -100,7 +105,7 @@ function AllLists() {
 		}
 
 		getBoards();
-	},[user_token])
+	},[user_token, is_logged, navigate])
 
 	// console.log(boards);
 	
@@ -109,7 +114,7 @@ function AllLists() {
 		return (
 			<>
 				<Navbar/>
-				<div className="container p-4 mt-3">
+				<div className="container p-4 mt-3 sm:max-w-xl sm:mx-auto md:max-w-3xl lg:max-w-5xl">
 					<h2 className="text-4xl font-bold mb-2">Mes listes</h2>
 					{showCreatePreviewForm && <CreatePreviewForm createPreview={addBoardPreview} onClose={handleOnClose}/>} {/*affichage du formulaire si show showCreatePreviewForm*/}
 					
@@ -117,7 +122,7 @@ function AllLists() {
 					<button onClick={() => setShowCreatePreviewForm(true)} className="p-2 bg-blue-500 mb-2 text-white">+ Créer une nouvelle liste</button>
 					<div className="boardsContainer flex flex-wrap gap-2 mt-5">
 						{boards.map((preview, index) => (
-							<BoardPreview key={index} boardPreviewName={preview.board_name} auth_token={user_token} board_id={preview.id} onDelete={async () => await deleteBoard(auth_token, preview.id)}/>
+							<BoardPreview key={index} boardPreviewName={preview.board_name} auth_token={user_token} board_id={preview.id} onTitleEdit={editTitle} onDelete={async () => await deleteBoard(auth_token, preview.id)}/>
 						))}
 					</div>
 				</div>
